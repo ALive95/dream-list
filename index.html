@@ -151,6 +151,18 @@
   @keyframes sheen { from { background-position: 150% 0; } to { background-position: -50% 0; } }
   .card:hover.foil::after { animation: none; }
 
+  /* Old-border foil stamp: the classic shooting star (1999–2003 foils), drawn on the card's 488×680 grid */
+  .shooting-star { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; overflow: visible; }
+  .shooting-star .ss-rays, .shooting-star .ss-core {
+    transform-box: view-box; transform-origin: 93.75px 602.5px;
+    animation: ss-twinkle 2.6s ease-in-out infinite;
+  }
+  .shooting-star .ss-core { animation-name: ss-glow; }
+  .shooting-star .ss-glint { animation: ss-glint 3.2s ease-in infinite; }
+  @keyframes ss-twinkle { 0%, 100% { transform: scale(.94); opacity: .9; } 50% { transform: scale(1.06); opacity: 1; } }
+  @keyframes ss-glow { 0%, 100% { transform: scale(.85); opacity: .85; } 50% { transform: scale(1.2); opacity: 1; } }
+  @keyframes ss-glint { 0% { transform: translateX(170px); } 70%, 100% { transform: translateX(-40px); } }
+
   .sparkle {
     position: absolute; z-index: 3;
     width: 4px; height: 4px; background: #fff;
@@ -312,11 +324,26 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="ssCore">
+      <stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#fff" stop-opacity=".95"/>
+      <stop offset=".7" stop-color="#fff4e6" stop-opacity=".45"/><stop offset="1" stop-color="#fff4e6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ssTail" x1="94" y1="602" x2="249" y2="586" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/><stop offset=".75" stop-color="#fff" stop-opacity=".97"/><stop offset="1" stop-color="#fff" stop-opacity=".55"/>
+    </linearGradient>
+    <linearGradient id="ssGlint" x1="0" x2="1">
+      <stop offset="0" stop-color="#ffd9a8" stop-opacity="0"/><stop offset=".5" stop-color="#ffc98a" stop-opacity=".9"/><stop offset="1" stop-color="#ffd9a8" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="ssTailClip"><path d="M94 604.5 C95.2 605.1 102.0 601.8 106 600.5 C110.0 599.2 114.0 598.1 118 597 C122.0 595.9 126.0 594.7 130 593.6 C134.0 592.5 138.0 591.6 142 590.6 C146.0 589.6 150.0 588.6 154 587.6 C158.0 586.6 162.0 585.6 166 584.8 C170.0 584.0 174.0 583.1 178 582.6 C182.0 582.1 186.0 582.2 190 582 C194.0 581.8 198.0 581.7 202 581.6 C206.0 581.5 210.0 581.5 214 581.6 C218.0 581.8 222.0 582.0 226 582.5 C230.0 583.0 234.2 583.8 238 584.5 C241.8 585.2 249.0 587.2 249 587 C249.0 586.8 241.8 584.4 238 583.4 C234.2 582.4 230.0 581.4 226 580.8 C222.0 580.2 218.0 579.9 214 579.6 C210.0 579.3 206.0 579.4 202 579.2 C198.0 579.0 194.0 578.4 190 578.3 C186.0 578.2 182.0 578.4 178 578.6 C174.0 578.8 170.0 579.1 166 579.6 C162.0 580.1 158.0 580.8 154 581.6 C150.0 582.4 146.0 583.6 142 584.6 C138.0 585.6 134.0 586.6 130 587.6 C126.0 588.6 122.0 589.6 118 590.6 C114.0 591.6 109.2 592.5 106 593.6 C102.8 594.7 101.0 595.2 99 597 C97.0 598.8 92.8 603.9 94 604.5 Z"/></clipPath>
+  </defs>
+</svg>
 <canvas id="sky" aria-hidden="true"></canvas>
 
 <header>
   <h1>DREAM LIST</h1>
-  <p class="subtitle">cards I'm wishing upon, somewhere above the clouds</p>
+  <p class="subtitle">Reading the card explains the card</p>
   <div class="counter" id="counter">&nbsp;</div>
 </header>
 
@@ -666,6 +693,27 @@
     return;
   }
 
+  // Shooting star foil stamp. Measured on a 1997-frame foil scan, in the card's 488×680 coordinates:
+  // star centre at the text box's bottom-left corner, 8 rays, crescent tail arcing up-right.
+  const SS_CX = 93.75, SS_CY = 602.5;
+  const ssRay = (x2, y2, w) => {
+    const dx = x2 - SS_CX, dy = y2 - SS_CY, len = Math.hypot(dx, dy);
+    const px = (-dy / len) * w, py = (dx / len) * w;
+    return `<polygon points="${(SS_CX + px).toFixed(2)},${(SS_CY + py).toFixed(2)} ${x2},${y2} ${(SS_CX - px).toFixed(2)},${(SS_CY - py).toFixed(2)}"/>`;
+  };
+  const SHOOTING_STAR = `<svg class="shooting-star" viewBox="0 0 488 680" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M94 604.5 C95.2 605.1 102.0 601.8 106 600.5 C110.0 599.2 114.0 598.1 118 597 C122.0 595.9 126.0 594.7 130 593.6 C134.0 592.5 138.0 591.6 142 590.6 C146.0 589.6 150.0 588.6 154 587.6 C158.0 586.6 162.0 585.6 166 584.8 C170.0 584.0 174.0 583.1 178 582.6 C182.0 582.1 186.0 582.2 190 582 C194.0 581.8 198.0 581.7 202 581.6 C206.0 581.5 210.0 581.5 214 581.6 C218.0 581.8 222.0 582.0 226 582.5 C230.0 583.0 234.2 583.8 238 584.5 C241.8 585.2 249.0 587.2 249 587 C249.0 586.8 241.8 584.4 238 583.4 C234.2 582.4 230.0 581.4 226 580.8 C222.0 580.2 218.0 579.9 214 579.6 C210.0 579.3 206.0 579.4 202 579.2 C198.0 579.0 194.0 578.4 190 578.3 C186.0 578.2 182.0 578.4 178 578.6 C174.0 578.8 170.0 579.1 166 579.6 C162.0 580.1 158.0 580.8 154 581.6 C150.0 582.4 146.0 583.6 142 584.6 C138.0 585.6 134.0 586.6 130 587.6 C126.0 588.6 122.0 589.6 118 590.6 C114.0 591.6 109.2 592.5 106 593.6 C102.8 594.7 101.0 595.2 99 597 C97.0 598.8 92.8 603.9 94 604.5 Z" fill="url(#ssTail)" stroke="#e7a676" stroke-width=".7" stroke-opacity=".75"/>
+      <g clip-path="url(#ssTailClip)"><rect class="ss-glint" x="60" y="560" width="45" height="50" fill="url(#ssGlint)"/></g>
+      <g class="ss-rays" fill="#fff" stroke="#e9ad7e" stroke-width=".6" stroke-opacity=".85" stroke-linejoin="round">
+        ${[ssRay(93.75, 568.5, 2), ssRay(93.75, 640, 2), ssRay(52.5, 602.5, 2), ssRay(135, 602.5, 2),
+           ssRay(73.75, 585, 1.3), ssRay(113.75, 583.75, 1.3), ssRay(73.75, 622.5, 1.3), ssRay(111.25, 621.25, 1.3)].join("")}
+      </g>
+      <circle class="ss-core" cx="${SS_CX}" cy="${SS_CY}" r="9" fill="url(#ssCore)"/>
+    </svg>`;
+  // Old-border foils printed before the 8th Edition frame (July 2003) carry the star
+  const hasShootingStar = (card) =>
+    !!card && (card.frame === "1997" || card.frame === "1993") && (card.released_at || "9999") < "2003-07-28";
+
   let cards = new Map();
   try {
     cards = await fetchCollection([...new Set(entries.map((e) => e.scryfall_id).filter(Boolean))]);
@@ -703,6 +751,7 @@
           ${images.length
             ? `<img src="${escapeHtml(images[0])}" alt="${escapeHtml(entry.name)}" loading="lazy">`
             : `<div class="missing">${escapeHtml(entry.name)}<br>(no image)</div>`}
+          ${entry.finish === "foil" && hasShootingStar(card) ? SHOOTING_STAR : ""}
           ${sparkles}
           ${images.length > 1 ? `<button class="btn small flip" type="button">FLIP</button>` : ""}
         </div>
