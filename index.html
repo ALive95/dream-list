@@ -216,6 +216,95 @@
   }
   footer a { color: inherit; }
 
+  /* ---------- Language switch for the guide ---------- */
+  html[data-ui="en"] [data-lang="it"], html[data-ui="it"] [data-lang="en"] { display: none !important; }
+
+  /* ---------- Balloon hit area + banner ---------- */
+  #balloonHit {
+    position: fixed; left: 0; top: 0; z-index: 6;
+    width: 84px; height: 108px;
+    padding: 0; border: 0; background: transparent; cursor: pointer;
+    transform: translate(-200px, -200px);
+  }
+  #balloonHit:focus-visible { outline: 3px dashed var(--white); outline-offset: 4px; }
+  #balloonHit .banner {
+    position: absolute; right: calc(100% - 22px); top: 86px;
+    white-space: nowrap;
+    font-family: "Press Start 2P", monospace; font-size: 9px; letter-spacing: 1px;
+    padding: 6px 8px; color: var(--ink); background: var(--white);
+    box-shadow: 0 0 0 3px var(--ink), 3px 3px 0 3px var(--red);
+    animation: banner-wave 1.6s steps(2) infinite;
+  }
+  #balloonHit .banner::after {           /* rope to the basket */
+    content: ""; position: absolute; left: 100%; top: 50%; width: 14px;
+    border-top: 3px dotted var(--ink);
+  }
+  #balloonHit:hover .banner { background: #fff1c9; }
+  @keyframes banner-wave { 50% { transform: translateY(2px); } }
+
+  .footer-guide {
+    font: inherit; color: inherit; background: none; border: 0; padding: 0;
+    text-decoration: underline; cursor: pointer; text-shadow: inherit;
+  }
+
+  /* ---------- Dialogs ---------- */
+  .overlay {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(74, 59, 99, .5);
+    display: grid; place-items: center; padding: 20px;
+  }
+  .overlay[hidden] { display: none; }
+  .dialog {
+    width: min(760px, 100%); max-height: calc(100vh - 40px); overflow: auto;
+    padding: 18px 24px 24px; font-size: 21px; line-height: 1.25;
+    animation: pop .25s steps(4) both;
+  }
+  .dialog.ask { width: min(460px, 100%); }
+  @keyframes pop { from { transform: scale(.92); opacity: 0; } to { transform: none; opacity: 1; } }
+  .dialog-top {
+    display: flex; justify-content: space-between; align-items: center; margin: -18px -24px 8px; padding: 14px 24px 10px;
+    position: sticky; top: -18px; z-index: 2; background: var(--white);
+  }
+  .langs { display: flex; gap: 8px; }
+  .langs button, .dialog .close {
+    font-family: "Press Start 2P", monospace; font-size: 9px; cursor: pointer;
+    padding: 6px 8px; border: 0; background: #e3f1fa; color: var(--ink);
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+  .langs button.on { background: var(--red); color: var(--white); }
+  .dialog h2 { font-family: "Press Start 2P", monospace; font-size: 15px; line-height: 1.6; margin: 10px 0 12px; color: var(--red); }
+  .dialog h3 {
+    font-family: "Press Start 2P", monospace; font-size: 11px; line-height: 1.6;
+    margin: 26px 0 8px; display: flex; gap: 10px; align-items: center;
+  }
+  .dialog h3 .num {
+    display: inline-grid; place-items: center; width: 24px; height: 24px; flex: none;
+    background: var(--red); color: var(--white); box-shadow: 0 0 0 2px var(--ink);
+  }
+  .dialog p { margin: 8px 0; }
+  .dialog ul { margin: 6px 0; padding-left: 22px; }
+  .dialog li { margin: 4px 0; }
+  .dialog b { color: var(--ink); }
+  .dialog-buttons { display: flex; gap: 14px; margin-top: 18px; flex-wrap: wrap; }
+  .dialog-buttons .btn { flex: 1 1 160px; font-size: 10px; padding: 12px 8px; }
+  .noask { display: flex; gap: 8px; align-items: center; margin-top: 16px; font-size: 19px; color: #7d6a99; cursor: pointer; }
+
+  table.conditions { border-collapse: collapse; margin: 10px 0; width: 100%; max-width: 480px; }
+  table.conditions th, table.conditions td { padding: 3px 10px; text-align: left; border-bottom: 2px dotted #e3d6ea; }
+  table.conditions th { font-family: "Press Start 2P", monospace; font-size: 9px; color: #7d6a99; }
+  table.conditions tbody tr:nth-child(2) td { background: #e3f1fa; }
+
+  .compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin: 12px 0; }
+  .compare figure { margin: 0; }
+  .compare .imgs { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; align-items: end; }
+  .compare img { width: 100%; display: block; border-radius: 4.75% / 3.5%; }
+  .compare .zoom {
+    aspect-ratio: 1; background-size: 450%; background-position: 0% 100%; background-repeat: no-repeat;
+    box-shadow: 0 0 0 2px var(--ink); image-rendering: auto;
+  }
+  .compare figcaption { margin-top: 6px; font-size: 19px; line-height: 1.15; }
+  .compare .good { color: #2f8a5b; } .compare .bad { color: var(--red); }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
     .sparkle { opacity: .8; }
@@ -235,7 +324,97 @@
   <div class="panel message"><span class="blink">loading the sky…</span></div>
 </main>
 
-<footer>card data &amp; images from <a href="https://scryfall.com" target="_blank" rel="noopener">Scryfall</a></footer>
+<footer><button type="button" class="footer-guide" id="footerGuide">how to buy · come comprare</button> &nbsp;·&nbsp; card data &amp; images from <a href="https://scryfall.com" target="_blank" rel="noopener">Scryfall</a></footer>
+
+<!-- Balloon in the sky: click to open the guide -->
+<button id="balloonHit" type="button" aria-label="Buying guide / Guida all'acquisto">
+  <span class="banner">GUIDE ✦ GUIDA</span>
+</button>
+
+<!-- "First time?" prompt shown when a shop button is clicked -->
+<div class="overlay" id="askOverlay" hidden>
+  <div class="panel dialog ask" role="dialog" aria-modal="true" aria-labelledby="askTitle">
+    <div class="dialog-top">
+      <div class="langs"><button type="button" data-setlang="en">EN</button><button type="button" data-setlang="it">IT</button></div>
+      <button type="button" class="close" data-close aria-label="Close">✕</button>
+    </div>
+    <h2 id="askTitle"><span data-lang="en">First time on <b class="site"></b>?</span><span data-lang="it">Prima volta su <b class="site"></b>?</span></h2>
+    <p data-lang="en">I wrote a short guide on picking the right edition and condition, and on which sellers to avoid.</p>
+    <p data-lang="it">Ho scritto una breve guida su come scegliere l'edizione e la condizione giuste, e su quali venditori evitare.</p>
+    <div class="dialog-buttons">
+      <button type="button" class="btn" id="askGuide"><span data-lang="en">READ THE GUIDE</span><span data-lang="it">LEGGI LA GUIDA</span></button>
+      <a class="btn alt" id="askGo" target="_blank" rel="noopener"><span data-lang="en">GO TO </span><span data-lang="it">VAI SU </span><span class="site-upper"></span> ↗</a>
+    </div>
+    <label class="noask"><input type="checkbox" id="askNever"> <span data-lang="en">Don't ask me again</span><span data-lang="it">Non chiedermelo più</span></label>
+  </div>
+</div>
+
+<!-- The guide -->
+<div class="overlay" id="guideOverlay" hidden>
+  <div class="panel dialog guide" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="dialog-top">
+      <div class="langs"><button type="button" data-setlang="en">EN</button><button type="button" data-setlang="it">IT</button></div>
+      <button type="button" class="close" data-close aria-label="Close">✕</button>
+    </div>
+    <h2 id="guideTitle"><span data-lang="en">HOW TO BUY A CARD</span><span data-lang="it">COME COMPRARE UNA CARTA</span></h2>
+    <p data-lang="en">Every card on my list has two buttons that open its exact edition on Cardmarket and CardTrader. A few things to know before buying:</p>
+    <p data-lang="it">Ogni carta della mia lista ha due pulsanti che aprono la sua edizione esatta su Cardmarket e CardTrader. Qualche cosa da sapere prima di comprare:</p>
+
+    <h3><span class="num">1</span><span data-lang="en">Create an account</span><span data-lang="it">Crea un account</span></h3>
+    <ul data-lang="en">
+      <li><b>Cardmarket</b> (cardmarket.com): click <i>Sign up</i> at the top right, confirm your email and add your shipping address.</li>
+      <li><b>CardTrader</b> (cardtrader.com): click <i>Sign up</i>, confirm your email and add your address. Offers marked <i>CardTrader Zero</i> are shipped together by CardTrader itself, with tracking.</li>
+      <li>Both sites hold your payment until you confirm the card has arrived: when it does, remember to confirm reception.</li>
+    </ul>
+    <ul data-lang="it">
+      <li><b>Cardmarket</b> (cardmarket.com): clicca <i>Registrati</i> in alto a destra, conferma l'email e inserisci il tuo indirizzo di spedizione.</li>
+      <li><b>CardTrader</b> (cardtrader.com): clicca <i>Registrati</i>, conferma l'email e inserisci il tuo indirizzo. Le offerte con il marchio <i>CardTrader Zero</i> vengono spedite insieme da CardTrader stesso, con tracciamento.</li>
+      <li>Entrambi i siti trattengono il pagamento finché non confermi che la carta è arrivata: quando arriva, ricordati di confermare la ricezione.</li>
+    </ul>
+
+    <h3><span class="num">2</span><span data-lang="en">Condition</span><span data-lang="it">Condizione</span></h3>
+    <p data-lang="en">The two sites use different names for the same scale. From best to worst (the match is approximate):</p>
+    <p data-lang="it">I due siti usano nomi diversi per la stessa scala. Dalla migliore alla peggiore (la corrispondenza è approssimativa):</p>
+    <table class="conditions">
+      <thead><tr><th>Cardmarket</th><th>CardTrader</th></tr></thead>
+      <tbody>
+        <tr><td>Mint (MT)</td><td>Mint</td></tr>
+        <tr><td>Near Mint (NM)</td><td>Near Mint (NM)</td></tr>
+        <tr><td>Excellent (EX)</td><td>Slightly Played (SP)</td></tr>
+        <tr><td>Good (GD)</td><td>Moderately Played (MP)</td></tr>
+        <tr><td>Light Played (LP)</td><td>Played (PL)</td></tr>
+        <tr><td>Played (PL)</td><td>Heavily Played (HP)</td></tr>
+        <tr><td>Poor (PO)</td><td>Poor (PO)</td></tr>
+      </tbody>
+    </table>
+    <p data-lang="en">Careful: on Cardmarket <i>Light Played</i> is worse than <i>Good</i>, and <i>Played</i> means something different on the two sites. On my list, <b>NM+</b> means Near Mint or better; <b>ANY COND.</b> means condition doesn't matter.</p>
+    <p data-lang="it">Attenzione: su Cardmarket <i>Light Played</i> è peggio di <i>Good</i>, e <i>Played</i> indica cose diverse sui due siti. Nella mia lista, <b>NM+</b> significa Near Mint o migliore; <b>ANY COND.</b> significa che la condizione non importa.</p>
+
+    <h3><span class="num">3</span><span data-lang="en">The edition matters</span><span data-lang="it">L'edizione è importante</span></h3>
+    <p data-lang="en">I'm looking for the exact edition shown on my list. The buttons already open the right one, so stay on that page and don't switch to another version. Some reprints look almost identical to the original but carry a small symbol in the bottom-left corner (for example cards from The List and the Mystery Boosters). Here is Parallax Wave:</p>
+    <p data-lang="it">Cerco l'edizione esatta indicata nella lista. I pulsanti aprono già quella giusta, quindi resta su quella pagina e non passare a un'altra versione. Alcune ristampe sono quasi identiche all'originale ma hanno un piccolo simbolo nell'angolo in basso a sinistra (per esempio le carte di The List e dei Mystery Booster). Ecco Parallax Wave:</p>
+    <div class="compare" id="compare"></div>
+    <p data-lang="en"><b>If you're unsure about the edition, just ask me!</b></p>
+    <p data-lang="it"><b>Se hai dubbi sull'edizione, chiedimi!</b></p>
+
+    <h3><span class="num">4</span><span data-lang="en">Shipping and customs</span><span data-lang="it">Spedizione e dogana</span></h3>
+    <p data-lang="en">Shipping cost and time depend on the country the seller ships from, shown next to each offer. Avoid sellers outside the European Union: the package can be held at customs, with extra fees and delays. That means <b>United Kingdom (England, Scotland, Wales), Switzerland, Norway, Iceland, Liechtenstein</b>, and any country outside Europe (USA, Canada, Japan, Hong Kong, Singapore…). Use the seller-country filter to keep only EU countries.</p>
+    <p data-lang="it">Costi e tempi di spedizione dipendono dal paese da cui spedisce il venditore, indicato accanto a ogni offerta. Evita i venditori fuori dall'Unione Europea: il pacco può restare bloccato in dogana, con costi extra e ritardi. Quindi niente <b>Regno Unito (Inghilterra, Scozia, Galles), Svizzera, Norvegia, Islanda, Liechtenstein</b>, né paesi fuori dall'Europa (Stati Uniti, Canada, Giappone, Hong Kong, Singapore…). Usa il filtro sul paese del venditore per tenere solo i paesi UE.</p>
+
+    <h3><span class="num">5</span><span data-lang="en">No signed, altered or graded cards</span><span data-lang="it">Niente carte firmate, alterate o gradate</span></h3>
+    <p data-lang="en">Always avoid cards that are <b>signed</b>, <b>altered</b> (hand-painted or with extended artwork) or <b>graded</b> (sealed in a hard plastic case with a grade, e.g. PSA or BGS). On Cardmarket check the icons and the seller's comment next to each offer; on CardTrader use the Signed, Altered and Graded filters.</p>
+    <p data-lang="it">Evita sempre le carte <b>firmate</b> (signed), <b>alterate</b> (altered: dipinte a mano o con l'illustrazione estesa) o <b>gradate</b> (graded: sigillate in una custodia rigida con un voto, es. PSA o BGS). Su Cardmarket controlla le icone e il commento del venditore accanto a ogni offerta; su CardTrader usa i filtri Signed, Altered e Graded.</p>
+
+    <h3><span class="num">6</span><span data-lang="en">Expensive cards (100 €+)</span><span data-lang="it">Carte costose (100 €+)</span></h3>
+    <p data-lang="en">Before buying, message the seller and ask for <b>"scans front and back"</b>: photos of the actual card, so you can see its real condition. Serious sellers are used to this request.</p>
+    <p data-lang="it">Prima di comprare, scrivi al venditore e chiedi <b>"scans front and back"</b> (scansioni fronte e retro): foto della carta vera, per vederne le reali condizioni. I venditori seri sono abituati a questa richiesta.</p>
+
+    <div class="dialog-buttons" id="guideContinueWrap" hidden>
+      <a class="btn alt" id="guideContinue" target="_blank" rel="noopener"><span data-lang="en">CONTINUE TO </span><span data-lang="it">CONTINUA SU </span><span class="site-upper"></span> ↗</a>
+    </div>
+  </div>
+</div>
+
 
 <script src="common.js"></script>
 <script>
@@ -245,6 +424,12 @@
   const canvas = document.getElementById("sky");
   const ctx = canvas.getContext("2d");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hit = document.getElementById("balloonHit");
+  let balloonT = 0, lastDraw = null, balloonPaused = false;
+  hit.addEventListener("pointerenter", () => (balloonPaused = true));
+  hit.addEventListener("pointerleave", () => (balloonPaused = false));
+  hit.addEventListener("focus", () => (balloonPaused = true));
+  hit.addEventListener("blur", () => (balloonPaused = false));
 
   const SKY = ["#78b8ea", "#82bdec", "#8dc4ee", "#99cbf0", "#a6d3f2", "#b4daf4", "#c3e2f7", "#d3eaf9", "#e4f2fb", "#f4f9fd", "#fbeaf1", "#f6cbda", "#f0a9bf"];
   const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
@@ -426,9 +611,14 @@
     // Balloon drifts slowly across the upper sky, bobbing gently, burner flickering
     {
       const bw = balloon.canvas.width;
-      const bx = reduceMotion ? Math.round(W * 0.14) : Math.round(((W * 0.1 + s * 0.9) % (W + bw)) - bw);
-      const by = Math.round(H * 0.16 + Math.sin(s * 0.6) * 3);
+      if (lastDraw !== null && !balloonPaused) balloonT += (t - lastDraw) / 1000;
+      lastDraw = t;
+      const bx = reduceMotion ? Math.round(W * 0.14) : Math.round(((W * 0.12 + balloonT * 0.9) % (W + bw)) - bw);
+      const by = Math.round(H * 0.16 + (balloonPaused ? 0 : Math.sin(s * 0.6) * 3));
       ctx.drawImage(balloon.canvas, bx, by);
+      hit.style.width = bw * PX + "px";
+      hit.style.height = balloon.canvas.height * PX + "px";
+      hit.style.transform = `translate(${bx * PX}px, ${by * PX}px)`;
       ctx.fillStyle = Math.floor(s * 6) % 3 === 0 ? "#fff3b0" : "#ffb04f";
       ctx.fillRect(bx + balloon.flameX, by + balloon.flameY, 1, 1);
       if (Math.floor(s * 6) % 2 === 0) { ctx.fillStyle = "#ff8a4c"; ctx.fillRect(bx + balloon.flameX, by + balloon.flameY + 1, 1, 1); }
@@ -529,8 +719,8 @@
       </div>
       ${entry.notes ? `<p class="notes">${escapeHtml(entry.notes)}</p>` : ""}
       <div class="links">
-        <a class="btn" href="${escapeHtml(cardmarketUrl(entry, card))}" target="_blank" rel="noopener">CARDMARKET</a>
-        <a class="btn alt" href="${escapeHtml(cardtraderUrl(entry, card))}" target="_blank" rel="noopener">CARDTRADER</a>
+        <a class="btn" href="${escapeHtml(cardmarketUrl(entry, card))}" target="_blank" rel="noopener" data-site="Cardmarket">CARDMARKET</a>
+        <a class="btn alt" href="${escapeHtml(cardtraderUrl(entry, card))}" target="_blank" rel="noopener" data-site="CardTrader">CARDTRADER</a>
       </div>`;
 
     // Double-faced cards: flip between faces
@@ -559,6 +749,118 @@
 
     list.appendChild(el);
   });
+})();
+</script>
+<script>
+/* ---------------- Buying guide ---------------- */
+const Guide = (() => {
+  const ASK_KEY = "dreamlist.noGuidePrompt", LANG_KEY = "dreamlist.lang";
+  const store = {
+    get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
+    set: (k, v) => { try { localStorage.setItem(k, v); } catch {} },
+  };
+  const askOverlay = document.getElementById("askOverlay");
+  const guideOverlay = document.getElementById("guideOverlay");
+  let pending = null;   // { url, site } of the shop link that was clicked
+  let compareLoaded = false;
+
+  function setLang(l) {
+    document.documentElement.dataset.ui = l;
+    document.querySelectorAll("[data-setlang]").forEach((b) => b.classList.toggle("on", b.dataset.setlang === l));
+    store.set(LANG_KEY, l);
+  }
+  setLang(store.get(LANG_KEY) || ((navigator.language || "").toLowerCase().startsWith("it") ? "it" : "en"));
+  document.querySelectorAll("[data-setlang]").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.setlang)));
+
+  function fillSite(root, p) {
+    root.querySelectorAll(".site").forEach((el) => (el.textContent = p ? p.site : ""));
+    root.querySelectorAll(".site-upper").forEach((el) => (el.textContent = p ? p.site.toUpperCase() : ""));
+  }
+
+  function show(overlay) {
+    overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+    overlay.querySelector(".dialog").scrollTop = 0;
+    (overlay.querySelector(".dialog-buttons .btn") || overlay.querySelector(".close")).focus({ preventScroll: true });
+  }
+  function hide(overlay) {
+    overlay.hidden = true;
+    if (askOverlay.hidden && guideOverlay.hidden) document.body.style.overflow = "";
+  }
+
+  function openGuide(p = null) {
+    pending = p;
+    hide(askOverlay);
+    fillSite(guideOverlay, p);
+    document.getElementById("guideContinueWrap").hidden = !p;
+    if (p) document.getElementById("guideContinue").href = p.url;
+    show(guideOverlay);
+    loadCompare();
+  }
+
+  function ask(p) {
+    pending = p;
+    fillSite(askOverlay, p);
+    document.getElementById("askGo").href = p.url;
+    document.getElementById("askNever").checked = false;
+    show(askOverlay);
+  }
+
+  // Shop buttons: ask first (unless the visitor said not to)
+  document.addEventListener("click", (ev) => {
+    const a = ev.target.closest("a[data-site]");
+    if (!a || store.get(ASK_KEY) === "1") return;
+    ev.preventDefault();
+    ask({ url: a.href, site: a.dataset.site });
+  });
+
+  document.getElementById("askGuide").addEventListener("click", () => openGuide(pending));
+  document.getElementById("askGo").addEventListener("click", () => hide(askOverlay));
+  document.getElementById("guideContinue").addEventListener("click", () => hide(guideOverlay));
+  document.getElementById("askNever").addEventListener("change", (e) => store.set(ASK_KEY, e.target.checked ? "1" : "0"));
+  document.getElementById("balloonHit").addEventListener("click", () => openGuide());
+  document.getElementById("footerGuide").addEventListener("click", () => openGuide());
+
+  for (const ov of [askOverlay, guideOverlay]) {
+    ov.addEventListener("click", (e) => { if (e.target === ov || e.target.closest("[data-close]")) hide(ov); });
+  }
+  addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!askOverlay.hidden) hide(askOverlay);
+    else if (!guideOverlay.hidden) hide(guideOverlay);
+  });
+
+  // Edition example: original Parallax Wave vs a reprint with the bottom-left symbol, live from Scryfall
+  async function loadCompare() {
+    if (compareLoaded) return;
+    compareLoaded = true;
+    const box = document.getElementById("compare");
+    try {
+      const q = '!"Parallax Wave" (set:nem or set:plst or set:mb2)';
+      const data = await scryfall(`/cards/search?q=${encodeURIComponent(q)}&unique=prints`);
+      const original = data.data.find((c) => c.set === "nem");
+      const reprint = data.data.find((c) => c.set === "plst") || data.data.find((c) => c.set === "mb2");
+      const fig = (card, good) => {
+        const img = cardImages(card, "large")[0];
+        return `<figure>
+          <div class="imgs">
+            <img src="${escapeHtml(img)}" alt="Parallax Wave, ${escapeHtml(card.set_name)}" loading="lazy">
+            <div class="zoom" style="background-image:url('${escapeHtml(img)}')" title="bottom-left corner"></div>
+          </div>
+          <figcaption class="${good ? "good" : "bad"}">${good ? "✓" : "✗"} ${escapeHtml(card.set_name)}
+            <span data-lang="en">${good ? "(original)" : "(reprint: small symbol bottom left)"}</span>
+            <span data-lang="it">${good ? "(originale)" : "(ristampa: piccolo simbolo in basso a sinistra)"}</span>
+          </figcaption>
+        </figure>`;
+      };
+      box.innerHTML = [original && fig(original, true), reprint && fig(reprint, false)].filter(Boolean).join("");
+    } catch {
+      compareLoaded = false;
+      box.innerHTML = "";
+    }
+  }
+
+  return { openGuide };
 })();
 </script>
 </body>
