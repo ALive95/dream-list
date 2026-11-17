@@ -97,12 +97,19 @@ function cardmarketUrl(entry, card) {
 const ctSlug = (s) =>
   String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
+// Promo series that CardTrader names differently from Scryfall (after dropping the year)
+const CT_SET_NAMES = {
+  "Arena League": "Arena League Promos",
+  "Magic Player Rewards": "Player Rewards Promos",
+};
+
 function cardtraderUrl(entry, card) {
   if (entry.cardtrader_url) return entry.cardtrader_url;
   const name = (card && card.name) || entry.name;
   let set = (card && card.set_name) || entry.set_name;
   const setType = (card && card.set_type) || entry.set_type;
   if (set && setType === "promo") set = set.replace(/\s+\d{4}$/, "");
+  set = CT_SET_NAMES[set] || set;
   if (!set) return `https://www.cardtrader.com/search?q=${encodeURIComponent(name)}`;
   return `https://www.cardtrader.com/cards/${ctSlug(name)}-${ctSlug(set)}`;
 }
