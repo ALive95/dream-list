@@ -207,8 +207,10 @@
 
   /* Text */
   .name {
+    display: block;             /* own line box: wrapped names don't inherit the 22px body line height */
     font-family: "Press Start 2P", monospace;
-    font-size: 12px; line-height: 1.6;
+    font-size: 12px; line-height: 1.35;
+    margin-bottom: 4px;
     color: var(--ink); text-decoration: none;
   }
   .name:hover { color: var(--red); }
