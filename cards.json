@@ -1,5 +1,19 @@
 [
   {
+    "uid": "2fb21e8a-0e8e-448b-96e5-49e61069a4a9",
+    "scryfall_id": "cef789e8-e4cc-4f61-bc15-debc2487777f",
+    "name": "Parallax Wave",
+    "set": "nem",
+    "set_name": "Nemesis",
+    "collector_number": "17",
+    "lang": "en",
+    "finish": "foil",
+    "condition": "GD",
+    "quantity": 1,
+    "notes": "No signed/artwork",
+    "added": "2026-11-17"
+  },
+  {
     "uid": "57b670ca-fabb-444e-9f7b-ed0bce7d10e3",
     "scryfall_id": "53ed5673-728f-4da3-ad18-3bd72032e815",
     "name": "Force of Will",
