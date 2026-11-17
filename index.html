@@ -129,7 +129,7 @@
     background-size: 260% 260%;
     background-position: var(--hx, 0%) var(--hy, 50%);
     mix-blend-mode: color-dodge;
-    opacity: .5;
+    opacity: .32;
     animation: holo 6s ease-in-out infinite alternate;
   }
   .card.foil.etched::after {
@@ -138,11 +138,11 @@
       rgba(200, 220, 255, .6) 54%, rgba(255, 200, 220, .6) 62%, transparent 74%);
     background-size: 260% 260%;
     mix-blend-mode: overlay;
-    opacity: .7;
+    opacity: .5;
   }
   .card.foil::before {
     z-index: 2;
-    background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, .55) 50%, transparent 58%);
+    background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, .38) 50%, transparent 58%);
     background-size: 300% 100%;
     mix-blend-mode: soft-light;
     animation: sheen 3.8s linear infinite;
@@ -195,6 +195,7 @@
   }
   .badge.foil-badge { background: linear-gradient(90deg, #ffd3e6, #fff1c9, #d4fff0, #d6ecff, #ead6ff); }
   .badge.qty { background: var(--red); color: var(--white); }
+  .badge.no { background: #ffe1e7; color: var(--red); box-shadow: 0 0 0 2px var(--red); }
   .notes { font-size: 20px; color: #7d6a99; margin: 0; }
 
   .links { display: flex; gap: 12px; margin-top: auto; }
@@ -232,8 +233,11 @@
   html[data-ui="en"] [data-lang="it"], html[data-ui="it"] [data-lang="en"] { display: none !important; }
 
   /* ---------- Balloon hit area + banner ---------- */
+  /* Page content sits above the balloon; empty space lets clicks through to it */
+  header, main, footer { position: relative; z-index: 1; pointer-events: none; }
+  header .counter, main > *, footer a, footer button { pointer-events: auto; }
   #balloonHit {
-    position: fixed; left: 0; top: 0; z-index: 6;
+    position: fixed; left: 0; top: 0; z-index: 0;   /* behind the page content, above the sky */
     width: 84px; height: 108px;
     padding: 0; border: 0; background: transparent; cursor: pointer;
     transform: translate(-200px, -200px);
@@ -740,8 +744,8 @@
     el.style.animationDelay = `${Math.min(i, 12) * 60}ms`;
 
     const sparkles = isFoil
-      ? Array.from({ length: 4 }, () =>
-          `<span class="sparkle" style="left:${10 + Math.random() * 80}%;top:${8 + Math.random() * 84}%;animation-delay:${(Math.random() * 2.4).toFixed(2)}s"></span>`
+      ? Array.from({ length: 2 }, (_, k) =>
+          `<span class="sparkle" style="left:${(k ? 50 : 12) + Math.random() * 38}%;top:${8 + Math.random() * 70}%;animation-delay:${(k * 1.2 + Math.random() * 0.6).toFixed(2)}s"></span>`
         ).join("")
       : "";
 
@@ -765,6 +769,7 @@
         <span class="badge" title="${escapeHtml(cond.label)}">${escapeHtml(cond.code === "ANY" ? "ANY COND." : cond.code + "+")}</span>
         <span class="badge ${isFoil ? "foil-badge" : ""}">${escapeHtml(FINISHES[entry.finish] || "Non-foil")}</span>
         ${(Number(entry.quantity) || 1) > 1 ? `<span class="badge qty">×${Number(entry.quantity)}</span>` : ""}
+        <span class="badge no">NO signed/altered</span>
       </div>
       ${entry.notes ? `<p class="notes">${escapeHtml(entry.notes)}</p>` : ""}
       <div class="links">
