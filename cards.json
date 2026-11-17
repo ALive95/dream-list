@@ -1,5 +1,47 @@
 [
   {
+    "uid": "8a6a1370-02e4-4385-8730-2b203b4c51e5",
+    "scryfall_id": "a7a64413-ab7b-4f0d-8e9a-3d1fbe66a99f",
+    "name": "Quirion Ranger",
+    "set": "f01",
+    "set_name": "Friday Night Magic 2001",
+    "collector_number": "9",
+    "lang": "en",
+    "finish": "foil",
+    "condition": "EX",
+    "quantity": 1,
+    "notes": "",
+    "added": "2026-11-17"
+  },
+  {
+    "uid": "f084e404-07e1-419d-9741-b2559b299cb2",
+    "scryfall_id": "6563f790-862c-465a-b963-7a61f2385516",
+    "name": "Crop Rotation",
+    "set": "ulg",
+    "set_name": "Urza's Legacy",
+    "collector_number": "98",
+    "lang": "en",
+    "finish": "foil",
+    "condition": "EX",
+    "quantity": 1,
+    "notes": "",
+    "added": "2026-11-17"
+  },
+  {
+    "uid": "bb72d4c5-d0ad-4302-93b3-729b57f9608d",
+    "scryfall_id": "77d23045-905b-44cb-9af9-cc6ad717477d",
+    "name": "Karmic Guide",
+    "set": "ulg",
+    "set_name": "Urza's Legacy",
+    "collector_number": "11",
+    "lang": "en",
+    "finish": "foil",
+    "condition": "EX",
+    "quantity": 1,
+    "notes": "",
+    "added": "2026-11-17"
+  },
+  {
     "uid": "2fb21e8a-0e8e-448b-96e5-49e61069a4a9",
     "scryfall_id": "cef789e8-e4cc-4f61-bc15-debc2487777f",
     "name": "Parallax Wave",
