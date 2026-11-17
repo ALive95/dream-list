@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dream List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #b5dcf3;
+    --white: #fffafc;
+    --pink: #f4b6cd;
+    --pink-deep: #e98aa8;
+    --red: #de5a6c;
+    --ink: #4a3b63;      /* dusky twilight plum, for text and pixel borders */
+    --px: 4px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: "VT323", monospace;
+    font-size: 22px;
+    color: var(--ink);
+    background: var(--sky);
+    image-rendering: pixelated;
+  }
+
+  /* Pixel sky, drawn at low resolution and scaled up */
+  #sky {
+    position: fixed; inset: 0;
+    width: 100vw; height: 100vh;
+    z-index: -1;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  header {
+    text-align: center;
+    padding: 64px 16px 24px;
+  }
+  h1 {
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(28px, 6vw, 56px);
+    margin: 0;
+    color: var(--white);
+    letter-spacing: 4px;
+    text-shadow:
+      4px 4px 0 var(--pink-deep),
+      8px 8px 0 var(--red),
+      12px 12px 0 rgba(74, 59, 99, .35);
+  }
+  .subtitle {
+    margin: 22px 0 0;
+    font-size: 26px;
+    color: var(--white);
+    text-shadow: 2px 2px 0 var(--ink);
+  }
+  .counter {
+    display: inline-block;
+    margin-top: 16px;
+    font-family: "Press Start 2P", monospace;
+    font-size: 11px;
+    padding: 8px 12px;
+    background: var(--white);
+    color: var(--red);
+    box-shadow: 0 0 0 var(--px) var(--ink), var(--px) var(--px) 0 var(--px) rgba(74,59,99,.35);
+  }
+
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px 24px 160px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 290px));
+    justify-content: center;
+    gap: 48px 36px;
+  }
+
+  /* Pixel panel: square outline drawn with box-shadows, chunky offset shadow */
+  .panel {
+    position: relative;
+    background: var(--white);
+    padding: 14px;
+    box-shadow:
+      0 calc(-1 * var(--px)) 0 0 var(--ink),
+      0 var(--px) 0 0 var(--ink),
+      calc(-1 * var(--px)) 0 0 0 var(--ink),
+      var(--px) 0 0 0 var(--ink),
+      calc(2 * var(--px)) calc(3 * var(--px)) 0 0 rgba(74, 59, 99, .28);
+  }
+
+  .entry { display: flex; flex-direction: column; gap: 12px; animation: float-in .6s steps(6) both; }
+  @keyframes float-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+  /* Card image + tilt */
+  .card-wrap { perspective: 900px; }
+  .card {
+    position: relative;
+    aspect-ratio: 488 / 680;
+    border-radius: 4.75% / 3.5%;
+    overflow: hidden;
+    background: var(--pink);
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform .25s ease-out;
+    box-shadow: 0 6px 0 rgba(74, 59, 99, .25);
+  }
+  .card img { display: block; width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+  .card .missing {
+    position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+    padding: 16px; font-size: 22px; color: var(--ink);
+  }
+
+  /* Foil: rainbow holo layer + moving sheen + pixel sparkles */
+  .card.foil::after, .card.foil::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  }
+  .card.foil::after {
+    background: linear-gradient(115deg,
+      transparent 18%,
+      rgba(255, 70, 160, .55) 28%,
+      rgba(255, 210, 90, .55) 36%,
+      rgba(90, 255, 190, .55) 44%,
+      rgba(80, 190, 255, .55) 52%,
+      rgba(190, 110, 255, .55) 60%,
+      transparent 72%);
+    background-size: 260% 260%;
+    background-position: var(--hx, 0%) var(--hy, 50%);
+    mix-blend-mode: color-dodge;
+    opacity: .5;
+    animation: holo 6s ease-in-out infinite alternate;
+  }
+  .card.foil.etched::after {
+    background: linear-gradient(115deg,
+      transparent 20%, rgba(255, 230, 170, .6) 34%, rgba(255, 255, 255, .7) 44%,
+      rgba(200, 220, 255, .6) 54%, rgba(255, 200, 220, .6) 62%, transparent 74%);
+    background-size: 260% 260%;
+    mix-blend-mode: overlay;
+    opacity: .7;
+  }
+  .card.foil::before {
+    z-index: 2;
+    background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, .55) 50%, transparent 58%);
+    background-size: 300% 100%;
+    mix-blend-mode: soft-light;
+    animation: sheen 3.8s linear infinite;
+  }
+  @keyframes holo { from { background-position: 0% 30%; } to { background-position: 100% 70%; } }
+  @keyframes sheen { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+  .card:hover.foil::after { animation: none; }
+
+  .sparkle {
+    position: absolute; z-index: 3;
+    width: 4px; height: 4px; background: #fff;
+    box-shadow: 4px 0 #fff, -4px 0 #fff, 0 4px #fff, 0 -4px #fff, 0 0 6px 2px rgba(255,255,255,.6);
+    opacity: 0;
+    animation: twinkle 2.4s steps(4) infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(.5); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  .flip {
+    position: absolute; right: 10px; top: 10px; z-index: 4;
+  }
+
+  /* Text */
+  .name {
+    font-family: "Press Start 2P", monospace;
+    font-size: 12px; line-height: 1.6;
+    color: var(--ink); text-decoration: none;
+  }
+  .name:hover { color: var(--red); }
+  .set { font-size: 20px; color: #7d6a99; line-height: 1.1; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge {
+    font-size: 18px; line-height: 1; padding: 4px 8px 3px;
+    background: #e3f1fa; color: var(--ink);
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+  .badge.foil-badge { background: linear-gradient(90deg, #ffd3e6, #fff1c9, #d4fff0, #d6ecff, #ead6ff); }
+  .badge.qty { background: var(--red); color: var(--white); }
+  .notes { font-size: 20px; color: #7d6a99; margin: 0; }
+
+  .links { display: flex; gap: 12px; margin-top: auto; }
+  .btn {
+    flex: 1;
+    text-align: center;
+    font-family: "Press Start 2P", monospace;
+    font-size: 9px; letter-spacing: .5px;
+    padding: 10px 6px;
+    color: var(--white); background: var(--red);
+    text-decoration: none; border: 0; cursor: pointer;
+    box-shadow: 0 0 0 3px var(--ink), 0 6px 0 3px var(--ink);
+    transition: transform .08s steps(2);
+  }
+  .btn.alt { background: #6fa8dc; }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 0 0 3px var(--ink), 0 2px 0 3px var(--ink); }
+  .btn.small { flex: none; font-size: 8px; padding: 6px 8px; background: var(--white); color: var(--ink); }
+
+  .message {
+    grid-column: 1 / -1; justify-self: center; text-align: center;
+    max-width: 520px; font-size: 26px; padding: 28px 32px;
+  }
+  .blink { animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  footer {
+    text-align: center; font-size: 18px; color: var(--white);
+    text-shadow: 2px 2px 0 var(--ink);
+    padding: 0 16px 32px; margin-top: -120px; position: relative;
+  }
+  footer a { color: inherit; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .sparkle { opacity: .8; }
+  }
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<header>
+  <h1>DREAM LIST</h1>
+  <p class="subtitle">cards I'm wishing upon, somewhere above the clouds</p>
+  <div class="counter" id="counter">&nbsp;</div>
+</header>
+
+<main id="list">
+  <div class="panel message"><span class="blink">loading the sky…</span></div>
+</main>
+
+<footer>card data &amp; images from <a href="https://scryfall.com" target="_blank" rel="noopener">Scryfall</a></footer>
+
+<script src="common.js"></script>
+<script>
+/* ---------------- Pixel twilight sky ---------------- */
+(() => {
+  const PX = 4;                               // size of one "pixel" on screen
+  const canvas = document.getElementById("sky");
+  const ctx = canvas.getContext("2d");
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const SKY = ["#78b8ea", "#87c1ed", "#98caf0", "#aad5f3", "#bde0f6", "#d2eaf9", "#e8f4fc", "#f9e6ee", "#f6c9d9", "#f2a9bf", "#ea8aa1"];
+  const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
+
+  let W, H, horizon, skyLayer, sea1, sea2, clouds, stars;
+
+  // Small deterministic RNG so the scene is the same on every visit
+  function rng(seed) { return () => ((seed = (seed * 16807) % 2147483647) / 2147483647); }
+
+  function hex(c) { return [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]; }
+
+  function makeSky() {
+    const off = new OffscreenCanvasOrCanvas(W, H);
+    const g = off.getContext("2d");
+    const img = g.createImageData(W, H);
+    const pal = SKY.map(hex);
+    for (let y = 0; y < H; y++) {
+      const t = Math.min(1, y / horizon) * (pal.length - 1);
+      const i = Math.min(pal.length - 2, Math.floor(t));
+      const f = t - i;
+      for (let x = 0; x < W; x++) {
+        const c = f * 16 > BAYER[y & 3][x & 3] + 0.5 ? pal[i + 1] : pal[i];
+        const k = (y * W + x) * 4;
+        img.data[k] = c[0]; img.data[k + 1] = c[1]; img.data[k + 2] = c[2]; img.data[k + 3] = 255;
+      }
+    }
+    g.putImageData(img, 0, 0);
+
+    // Setting sun with a dithered glow and retro stripes, half hidden behind the cloud sea
+    const r = Math.round(Math.max(14, Math.min(W, H) * 0.11));
+    const cx = Math.round(W * 0.7), cy = horizon + Math.round(r * 0.25);
+    const glow = Math.round(r * 1.45);
+    for (let y = -glow; y <= glow; y++) {
+      for (let x = -glow; x <= glow; x++) {
+        const d2 = x * x + y * y;
+        if (d2 > glow * glow) continue;
+        const px = cx + x, py = cy + y;
+        if (d2 > r * r) {
+          // halo: denser near the disc, sparse further out
+          const t = (Math.sqrt(d2) - r) / (glow - r);
+          if ((1 - t) * 16 > BAYER[py & 3][px & 3] + 4) { g.fillStyle = t < 0.4 ? "#ffe6a8" : "#ffd9b5"; g.fillRect(px, py, 1, 1); }
+          continue;
+        }
+        if (y > -r * 0.1 && ((y + r) % 6 < 2)) continue;   // stripes
+        g.fillStyle = y < -r * 0.5 ? "#fff3b0" : y < -r * 0.1 ? "#ffd56e" : y < r * 0.4 ? "#ffb04f" : "#ff8a4c";
+        g.fillRect(px, py, 1, 1);
+      }
+    }
+    return off;
+  }
+
+  function OffscreenCanvasOrCanvas(w, h) { const c = document.createElement("canvas"); c.width = w; c.height = h; return c; }
+
+  // Cloud sprite from a shape predicate, shaded from white tops to pink bellies
+  function makeCloud(inside, w, h, shades) {
+    const c = new OffscreenCanvasOrCanvas(w, h), g = c.getContext("2d");
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      if (!inside(x, y)) continue;
+      let col;
+      if (!inside(x, y - 1)) col = "#ffffff";                        // bright rim
+      else if (!inside(x, y + 2) && y > h * 0.5) col = shades[2];     // shadowed underside
+      else {
+        const t = (y / h) * 3;
+        const i = Math.min(1, Math.floor(t));
+        col = (t - i) * 16 > BAYER[y & 3][x & 3] + 0.5 ? shades[i + 1] : shades[i];
+      }
+      g.fillStyle = col;
+      g.fillRect(x, y, 1, 1);
+    }
+    return c;
+  }
+
+  const inCircles = (circles, x, y) => circles.some(([cx, cy, r]) => (x - cx) ** 2 + (y - cy) ** 2 <= r * r);
+
+  // A seamless band of clouds (tileable horizontally)
+  function makeSea(seed, tileW, height, bumpMin, bumpMax, shades) {
+    const rand = rng(seed), circles = [];
+    for (let x = 0; x < tileW; x += 6 + Math.floor(rand() * 10)) {
+      const r = bumpMin + Math.floor(rand() * (bumpMax - bumpMin));
+      const cy = bumpMax + 2 + Math.floor(rand() * 6);
+      for (const dx of [-tileW, 0, tileW]) circles.push([x + dx, cy, r]);
+    }
+    const floor = bumpMax + 4;
+    return makeCloud((x, y) => y >= floor || inCircles(circles, x, y), tileW, height, shades);
+  }
+
+  // A small floating cloud: a few bumps on a flat pill-shaped base
+  function makePuff(rand) {
+    const baseY = 20, circles = [];
+    let x = 8;
+    const n = 2 + Math.floor(rand() * 3);
+    for (let i = 0; i < n; i++) {
+      const r = 4 + Math.floor(rand() * 6);
+      circles.push([x + r, baseY - Math.round(r * 0.5), r]);
+      x += Math.round(r * 1.4);
+    }
+    const xEnd = x + 6;
+    circles.push([8, baseY, 4], [xEnd, baseY, 4]);
+    const inside = (px, py) => (py >= baseY - 4 && py <= baseY + 4 && px >= 8 && px <= xEnd) || inCircles(circles, px, py);
+    return makeCloud(inside, xEnd + 6, baseY + 6, ["#ffffff", "#fff5f9", "#f6cfdf"]);
+  }
+
+  function build() {
+    W = Math.ceil(innerWidth / PX);
+    H = Math.ceil(innerHeight / PX);
+    canvas.width = W; canvas.height = H;
+    horizon = Math.round(H * 0.72);
+    skyLayer = makeSky();
+    sea1 = makeSea(7, 180, H - horizon + 12, 9, 18, ["#fff6fa", "#f9d6e4", "#efb0c8"]);
+    sea2 = makeSea(42, 220, Math.round((H - horizon) * 0.7) + 10, 10, 20, ["#ffffff", "#fde9f1", "#f5c3d6"]);
+
+    const rand = rng(1234);
+    clouds = Array.from({ length: Math.max(4, Math.round(W / 70)) }, () => ({
+      sprite: makePuff(rand),
+      x: rand() * W, y: Math.round(H * 0.12 + rand() * H * 0.45),
+      speed: 0.4 + rand() * 0.8,
+    }));
+    stars = Array.from({ length: Math.round(W * H / 900) }, () => ({
+      x: Math.floor(rand() * W), y: Math.floor(rand() * H * 0.4),
+      big: rand() < 0.15, phase: rand() * Math.PI * 2, speed: 0.5 + rand() * 1.5,
+    }));
+  }
+
+  function draw(t) {
+    const s = t / 1000;
+    ctx.drawImage(skyLayer, 0, 0);
+
+    for (const st of stars) {
+      const a = 0.5 + 0.5 * Math.sin(s * st.speed + st.phase);
+      if (a < 0.35) continue;
+      ctx.fillStyle = a > 0.8 ? "#ffffff" : "#fde8f1";
+      ctx.fillRect(st.x, st.y, 1, 1);
+      if (st.big && a > 0.75) {
+        ctx.fillRect(st.x - 1, st.y, 3, 1);
+        ctx.fillRect(st.x, st.y - 1, 1, 3);
+      }
+    }
+
+    for (const c of clouds) {
+      const w = c.sprite.width;
+      const x = Math.round(((c.x + s * c.speed) % (W + w)) - w);
+      ctx.drawImage(c.sprite, x, c.y);
+    }
+
+    const tile = (img, y, speed) => {
+      const off = Math.round((s * speed) % img.width);
+      for (let x = -off; x < W; x += img.width) ctx.drawImage(img, x, y);
+    };
+    tile(sea1, horizon - 6, 1.2);
+    tile(sea2, H - sea2.height + 4, 2.4);
+  }
+
+  let last = 0;
+  function loop(t) {
+    if (t - last > 66) { draw(t); last = t; }   // ~15 fps is plenty for drifting clouds
+    requestAnimationFrame(loop);
+  }
+
+  build();
+  draw(0);
+  if (!reduceMotion) requestAnimationFrame(loop);
+  let rt;
+  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { build(); draw(performance.now()); }, 150); });
+})();
+
+/* ---------------- Dream list ---------------- */
+(async () => {
+  const list = document.getElementById("list");
+  const counter = document.getElementById("counter");
+
+  function showMessage(html) { list.innerHTML = `<div class="panel message">${html}</div>`; }
+
+  let entries;
+  try {
+    const res = await fetch("cards.json?v=" + Date.now(), { cache: "no-store" });
+    entries = await res.json();
+  } catch (e) {
+    showMessage("couldn't read cards.json");
+    return;
+  }
+  if (!Array.isArray(entries) || entries.length === 0) {
+    counter.textContent = "0 DREAMS";
+    showMessage("no dreams yet…<br>the sky is clear ☁");
+    return;
+  }
+
+  let cards = new Map();
+  try {
+    cards = await fetchCollection([...new Set(entries.map((e) => e.scryfall_id).filter(Boolean))]);
+  } catch (e) {
+    console.warn("Scryfall unavailable", e);
+  }
+
+  const total = entries.reduce((n, e) => n + (Number(e.quantity) || 1), 0);
+  counter.textContent = `${entries.length} DREAM${entries.length === 1 ? "" : "S"} · ${total} CARD${total === 1 ? "" : "S"}`;
+  list.innerHTML = "";
+
+  entries.forEach((entry, i) => {
+    const card = cards.get(entry.scryfall_id);
+    const images = cardImages(card, "normal");
+    const isFoil = entry.finish === "foil" || entry.finish === "etched";
+    const lang = langInfo(entry.lang || "en");
+    const cond = condInfo(entry.condition || "ANY");
+    const setName = (card && card.set_name) || entry.set_name || "";
+    const setCode = ((card && card.set) || entry.set || "").toUpperCase();
+    const cn = (card && card.collector_number) || entry.collector_number || "";
+
+    const el = document.createElement("article");
+    el.className = "panel entry";
+    el.style.animationDelay = `${Math.min(i, 12) * 60}ms`;
+
+    const sparkles = isFoil
+      ? Array.from({ length: 4 }, () =>
+          `<span class="sparkle" style="left:${10 + Math.random() * 80}%;top:${8 + Math.random() * 84}%;animation-delay:${(Math.random() * 2.4).toFixed(2)}s"></span>`
+        ).join("")
+      : "";
+
+    el.innerHTML = `
+      <div class="card-wrap">
+        <div class="card ${isFoil ? "foil" : ""} ${entry.finish === "etched" ? "etched" : ""}">
+          ${images.length
+            ? `<img src="${escapeHtml(images[0])}" alt="${escapeHtml(entry.name)}" loading="lazy">`
+            : `<div class="missing">${escapeHtml(entry.name)}<br>(no image)</div>`}
+          ${sparkles}
+          ${images.length > 1 ? `<button class="btn small flip" type="button">FLIP</button>` : ""}
+        </div>
+      </div>
+      <div>
+        <a class="name" href="${escapeHtml((card && card.scryfall_uri) || "https://scryfall.com/search?q=" + encodeURIComponent('!"' + entry.name + '"'))}" target="_blank" rel="noopener">${escapeHtml(entry.name)}</a>
+        <div class="set">${escapeHtml(setName)} · ${escapeHtml(setCode)} #${escapeHtml(cn)}</div>
+      </div>
+      <div class="badges">
+        <span class="badge">${escapeHtml(lang.label)}</span>
+        <span class="badge" title="${escapeHtml(cond.label)}">${escapeHtml(cond.code === "ANY" ? "ANY COND." : cond.code + "+")}</span>
+        <span class="badge ${isFoil ? "foil-badge" : ""}">${escapeHtml(FINISHES[entry.finish] || "Non-foil")}</span>
+        ${(Number(entry.quantity) || 1) > 1 ? `<span class="badge qty">×${Number(entry.quantity)}</span>` : ""}
+      </div>
+      ${entry.notes ? `<p class="notes">${escapeHtml(entry.notes)}</p>` : ""}
+      <div class="links">
+        <a class="btn" href="${escapeHtml(cardmarketUrl(entry, card))}" target="_blank" rel="noopener">CARDMARKET</a>
+        <a class="btn alt" href="${escapeHtml(cardtraderUrl(entry, card))}" target="_blank" rel="noopener">CARDTRADER</a>
+      </div>`;
+
+    // Double-faced cards: flip between faces
+    const flip = el.querySelector(".flip");
+    if (flip) {
+      let face = 0;
+      flip.addEventListener("click", () => {
+        face = (face + 1) % images.length;
+        el.querySelector(".card img").src = images[face];
+      });
+    }
+
+    // Gentle tilt; on foils the holo layer follows the pointer
+    const cardEl = el.querySelector(".card");
+    cardEl.addEventListener("pointermove", (ev) => {
+      const r = cardEl.getBoundingClientRect();
+      const px = (ev.clientX - r.left) / r.width, py = (ev.clientY - r.top) / r.height;
+      cardEl.style.setProperty("--ry", `${(px - 0.5) * 14}deg`);
+      cardEl.style.setProperty("--rx", `${(0.5 - py) * 14}deg`);
+      cardEl.style.setProperty("--hx", `${px * 100}%`);
+      cardEl.style.setProperty("--hy", `${py * 100}%`);
+    });
+    cardEl.addEventListener("pointerleave", () => {
+      ["--rx", "--ry", "--hx", "--hy"].forEach((p) => cardEl.style.removeProperty(p));
+    });
+
+    list.appendChild(el);
+  });
+})();
+</script>
+</body>
+</html>
