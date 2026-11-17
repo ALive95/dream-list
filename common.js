@@ -79,23 +79,28 @@ function cardImages(card, size = "normal") {
   return [];
 }
 
-// Cardmarket: Scryfall's purchase link for the exact printing, plus language/condition/foil filters.
+// Cardmarket: a plain link to the exact printing via its Cardmarket product id.
+// No extra query parameters: Cardmarket's firewall blocked links with added filters.
+// A link pasted in Behind the Scenes (entry.cardmarket_url) always wins.
 function cardmarketUrl(entry, card) {
-  const base =
-    (card && card.purchase_uris && card.purchase_uris.cardmarket) ||
-    `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(entry.name)}`;
-  const url = new URL(base);
-  const lang = langInfo(entry.lang);
-  const cond = condInfo(entry.condition);
-  if (lang.cm) url.searchParams.set("language", lang.cm);
-  if (cond.cm) url.searchParams.set("minCondition", cond.cm);
-  url.searchParams.set("isFoil", entry.finish === "nonfoil" ? "N" : "Y");
-  return url.toString();
+  if (entry.cardmarket_url) return entry.cardmarket_url;
+  const id = (card && card.cardmarket_id) || entry.cardmarket_id;
+  if (id) return `https://www.cardmarket.com/en/Magic/Products?idProduct=${id}`;
+  if (card && card.purchase_uris && card.purchase_uris.cardmarket) return card.purchase_uris.cardmarket;
+  return `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(entry.name)}`;
 }
 
-// CardTrader has no per-printing link in Scryfall: search by card name.
-function cardtraderUrl(entry) {
-  return `https://www.cardtrader.com/search?q=${encodeURIComponent(entry.name)}`;
+// CardTrader: /cards/<card-name>-<set-name> redirects to that exact printing
+// (e.g. /cards/lightning-bolt-magic-2010). A link pasted in Behind the Scenes wins.
+const ctSlug = (s) =>
+  String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+function cardtraderUrl(entry, card) {
+  if (entry.cardtrader_url) return entry.cardtrader_url;
+  const name = (card && card.name) || entry.name;
+  const set = (card && card.set_name) || entry.set_name;
+  if (!set) return `https://www.cardtrader.com/search?q=${encodeURIComponent(name)}`;
+  return `https://www.cardtrader.com/cards/${ctSlug(name)}-${ctSlug(set)}`;
 }
 
 function escapeHtml(s) {

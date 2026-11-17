@@ -47,15 +47,16 @@
     color: var(--white);
     letter-spacing: 4px;
     text-shadow:
-      4px 4px 0 var(--pink-deep),
+      -4px 0 0 var(--ink), 4px 0 0 var(--ink), 0 -4px 0 var(--ink), 0 4px 0 var(--ink),
+      -4px -4px 0 var(--ink), 4px -4px 0 var(--ink), -4px 4px 0 var(--ink), 4px 4px 0 var(--ink),
       8px 8px 0 var(--red),
-      12px 12px 0 rgba(74, 59, 99, .35);
+      12px 12px 0 var(--ink);
   }
   .subtitle {
     margin: 22px 0 0;
     font-size: 26px;
     color: var(--white);
-    text-shadow: 2px 2px 0 var(--ink);
+    text-shadow: -2px 0 0 var(--ink), 2px 0 0 var(--ink), 0 -2px 0 var(--ink), 0 2px 0 var(--ink), 2px 2px 0 var(--ink), -2px -2px 0 var(--ink), 2px -2px 0 var(--ink), -2px 2px 0 var(--ink), 4px 4px 0 rgba(74, 59, 99, .4);
   }
   .counter {
     display: inline-block;
@@ -245,10 +246,10 @@
   const ctx = canvas.getContext("2d");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const SKY = ["#78b8ea", "#87c1ed", "#98caf0", "#aad5f3", "#bde0f6", "#d2eaf9", "#e8f4fc", "#f9e6ee", "#f6c9d9", "#f2a9bf", "#ea8aa1"];
+  const SKY = ["#78b8ea", "#82bdec", "#8dc4ee", "#99cbf0", "#a6d3f2", "#b4daf4", "#c3e2f7", "#d3eaf9", "#e4f2fb", "#f4f9fd", "#fbeaf1", "#f6cbda", "#f0a9bf"];
   const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
 
-  let W, H, horizon, skyLayer, sea1, sea2, clouds, stars;
+  let W, H, horizon, skyLayer, sea1, sea2, clouds, stars, balloon;
 
   // Small deterministic RNG so the scene is the same on every visit
   function rng(seed) { return () => ((seed = (seed * 16807) % 2147483647) / 2147483647); }
@@ -343,7 +344,40 @@
     const xEnd = x + 6;
     circles.push([8, baseY, 4], [xEnd, baseY, 4]);
     const inside = (px, py) => (py >= baseY - 4 && py <= baseY + 4 && px >= 8 && px <= xEnd) || inCircles(circles, px, py);
-    return makeCloud(inside, xEnd + 6, baseY + 6, ["#ffffff", "#fff5f9", "#f6cfdf"]);
+    return makeCloud(inside, xEnd + 6, baseY + 6, ["#ffffff", "#f7fbfe", "#d9ebf8"]);
+  }
+
+  // Pixel hot-air balloon: curved red/white gores, shading, rope and basket
+  function makeBalloon() {
+    const R = 9, cx = 10, cy = 10, taper = 8;
+    const w = 21, h = cy + taper + 9;
+    const half = (y) => {
+      const dy = y - cy;
+      if (dy <= 0) return Math.sqrt(Math.max(0, R * R - dy * dy));
+      if (dy <= taper) return R - (dy / taper) * (R - 3);
+      return -1;
+    };
+    const inside = (x, y) => { const hw = half(y); return hw >= 0 && Math.abs(x - cx) <= hw; };
+    const c = new OffscreenCanvasOrCanvas(w, h), g = c.getContext("2d");
+    const put = (x, y, col) => { g.fillStyle = col; g.fillRect(x, y, 1, 1); };
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      if (!inside(x, y)) continue;
+      if (!inside(x - 1, y) || !inside(x + 1, y) || !inside(x, y - 1) || !inside(x, y + 1)) { put(x, y, "#4a3b63"); continue; }
+      const u = (x - cx) / Math.max(1, half(y));                 // -1 … 1 across the envelope
+      const red = Math.floor((u + 1) * 3) % 2 === 0;
+      const dark = u > 0.5, light = u < -0.45 && y < cy;
+      let col = red ? (dark ? "#b8445a" : light ? "#f28a9a" : "#de5a6c") : (dark ? "#cfe3f4" : "#ffffff");
+      if (y === cy + 4) col = dark ? "#e0a93e" : "#ffd56e";      // golden band
+      put(x, y, col);
+    }
+    const top = cy + taper + 1;
+    put(cx - 3, top, "#4a3b63"); put(cx + 3, top, "#4a3b63");    // ropes
+    put(cx - 3, top + 1, "#4a3b63"); put(cx + 3, top + 1, "#4a3b63");
+    put(cx - 2, top + 2, "#4a3b63"); put(cx + 2, top + 2, "#4a3b63");
+    for (let x = cx - 3; x <= cx + 3; x++) put(x, top + 3, "#4a3b63");        // basket rim
+    for (let y = top + 4; y <= top + 6; y++) for (let x = cx - 3; x <= cx + 3; x++)
+      put(x, y, x === cx - 3 || x === cx + 3 || y === top + 6 ? "#4a3b63" : (x + y) % 3 === 0 ? "#8a5a44" : "#b07a55");
+    return { canvas: c, flameX: cx, flameY: top };
   }
 
   function build() {
@@ -352,9 +386,10 @@
     canvas.width = W; canvas.height = H;
     horizon = Math.round(H * 0.72);
     skyLayer = makeSky();
-    sea1 = makeSea(7, 180, H - horizon + 12, 9, 18, ["#fff6fa", "#f9d6e4", "#efb0c8"]);
-    sea2 = makeSea(42, 220, Math.round((H - horizon) * 0.7) + 10, 10, 20, ["#ffffff", "#fde9f1", "#f5c3d6"]);
+    sea1 = makeSea(7, 180, H - horizon + 12, 9, 18, ["#ffffff", "#f1f1fa", "#dcd6ec"]);
+    sea2 = makeSea(42, 220, Math.round((H - horizon) * 0.7) + 10, 10, 20, ["#ffffff", "#f3f9fd", "#d5e7f6"]);
 
+    balloon = makeBalloon();
     const rand = rng(1234);
     clouds = Array.from({ length: Math.max(4, Math.round(W / 70)) }, () => ({
       sprite: makePuff(rand),
@@ -386,6 +421,17 @@
       const w = c.sprite.width;
       const x = Math.round(((c.x + s * c.speed) % (W + w)) - w);
       ctx.drawImage(c.sprite, x, c.y);
+    }
+
+    // Balloon drifts slowly across the upper sky, bobbing gently, burner flickering
+    {
+      const bw = balloon.canvas.width;
+      const bx = reduceMotion ? Math.round(W * 0.14) : Math.round(((W * 0.1 + s * 0.9) % (W + bw)) - bw);
+      const by = Math.round(H * 0.16 + Math.sin(s * 0.6) * 3);
+      ctx.drawImage(balloon.canvas, bx, by);
+      ctx.fillStyle = Math.floor(s * 6) % 3 === 0 ? "#fff3b0" : "#ffb04f";
+      ctx.fillRect(bx + balloon.flameX, by + balloon.flameY, 1, 1);
+      if (Math.floor(s * 6) % 2 === 0) { ctx.fillStyle = "#ff8a4c"; ctx.fillRect(bx + balloon.flameX, by + balloon.flameY + 1, 1, 1); }
     }
 
     const tile = (img, y, speed) => {

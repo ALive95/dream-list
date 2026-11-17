@@ -57,8 +57,13 @@
   td img { width: 46px; border-radius: 3px; display: block; }
   td input, td select { padding: 4px 6px; }
   td .qty { width: 58px; }
+  td select { min-width: 72px; }
   td .act { display: flex; gap: 4px; }
   td .act button { padding: 2px 8px; box-shadow: none; }
+  .checklinks { font-size: 13px; color: var(--muted); }
+  .checklinks a, td.links a { color: var(--blue); font-weight: 600; margin-right: 8px; }
+  td.links { white-space: nowrap; }
+  td.links .custom { color: var(--red); }
   .empty { color: var(--muted); text-align: center; padding: 20px; }
   .tag { display: inline-block; font-size: 12px; padding: 1px 6px; background: #f4eef7; margin: 1px 2px 0 0; }
 
@@ -116,6 +121,13 @@
         <label class="span4">Notes
           <input id="notes" placeholder="e.g. max 25 €, signed is ok…">
         </label>
+        <label class="span3">Cardmarket link (optional)
+          <input id="cmUrl" placeholder="paste only if the automatic one is wrong">
+        </label>
+        <label class="span3">CardTrader link (optional)
+          <input id="ctUrl" placeholder="paste only if the automatic one is wrong">
+        </label>
+        <div class="span6 checklinks" id="checkLinks"></div>
         <div class="hint span6" id="hint"></div>
         <div class="span6"><button class="primary" id="add" type="button" disabled>Add to dream list</button></div>
       </div>
@@ -128,7 +140,7 @@
     <h2>CURRENT LIST</h2>
     <table>
       <thead><tr>
-        <th></th><th>Card</th><th class="hide-sm">Lang</th><th>Finish</th><th>Cond.</th><th>Qty</th><th class="hide-sm">Notes</th><th></th>
+        <th></th><th>Card</th><th class="hide-sm">Lang</th><th>Finish</th><th>Cond.</th><th>Qty</th><th class="hide-sm">Notes</th><th>Links</th><th></th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table>
@@ -265,6 +277,14 @@ async function loadEntries() {
   }
   dirty = false;
   renderRows();
+  const missing = entries.filter((e) => !e.cardmarket_id && e.scryfall_id);
+  if (missing.length) {
+    try {
+      const cards = await fetchCollection(missing.map((e) => e.scryfall_id));
+      for (const e of missing) { const c = cards.get(e.scryfall_id); if (c && c.cardmarket_id) e.cardmarket_id = c.cardmarket_id; }
+      renderRows();
+    } catch {}
+  }
 }
 
 /* ---------- Table ---------- */
@@ -274,7 +294,7 @@ function optionsHtml(list, selected, valueKey = "code", labelFn = (o) => o.label
 
 function renderRows() {
   const tb = $("rows");
-  if (!entries.length) { tb.innerHTML = `<tr><td colspan="8" class="empty">No cards yet.</td></tr>`; return; }
+  if (!entries.length) { tb.innerHTML = `<tr><td colspan="9" class="empty">No cards yet.</td></tr>`; return; }
   tb.innerHTML = entries.map((e, i) => `
     <tr data-i="${i}">
       <td><img loading="lazy" alt="" src="https://api.scryfall.com/cards/${encodeURIComponent(e.scryfall_id)}?format=image&version=small"></td>
@@ -284,8 +304,11 @@ function renderRows() {
       <td><select data-f="condition">${optionsHtml(CONDITIONS, e.condition, "code", (c) => c.code)}</select></td>
       <td><input class="qty" data-f="quantity" type="number" min="1" value="${Number(e.quantity) || 1}"></td>
       <td class="hide-sm"><input data-f="notes" value="${escapeHtml(e.notes || "")}"></td>
+      <td class="links">
+        <a href="${escapeHtml(cardmarketUrl(e))}" target="_blank" rel="noopener" class="${e.cardmarket_url ? "custom" : ""}" title="${e.cardmarket_url ? "custom link" : "automatic link"}">CM</a><a href="${escapeHtml(cardtraderUrl(e))}" target="_blank" rel="noopener" class="${e.cardtrader_url ? "custom" : ""}" title="${e.cardtrader_url ? "custom link" : "automatic link"}">CT</a>
+      </td>
       <td><div class="act">
-        <button data-a="up" title="Move up">↑</button><button data-a="down" title="Move down">↓</button><button data-a="del" title="Remove">✕</button>
+        <button data-a="links" title="Set exact Cardmarket / CardTrader links">🔗</button><button data-a="up" title="Move up">↑</button><button data-a="down" title="Move down">↓</button><button data-a="del" title="Remove">✕</button>
       </div></td>
     </tr>`).join("");
 }
@@ -301,6 +324,15 @@ $("rows").addEventListener("click", (ev) => {
   const a = ev.target.dataset.a, tr = ev.target.closest("tr");
   if (!a || !tr) return;
   const i = +tr.dataset.i;
+  if (a === "links") {
+    const e = entries[i];
+    const cm = prompt(`Exact Cardmarket link for ${e.name} (leave empty for automatic):`, e.cardmarket_url || "");
+    if (cm === null) return;
+    const ct = prompt(`Exact CardTrader link for ${e.name} (leave empty for automatic):`, e.cardtrader_url || "");
+    if (ct === null) return;
+    if (cm.trim()) e.cardmarket_url = cm.trim(); else delete e.cardmarket_url;
+    if (ct.trim()) e.cardtrader_url = ct.trim(); else delete e.cardtrader_url;
+  }
   if (a === "del") { if (!confirm(`Remove ${entries[i].name}?`)) return; entries.splice(i, 1); }
   if (a === "up" && i > 0) [entries[i - 1], entries[i]] = [entries[i], entries[i - 1]];
   if (a === "down" && i < entries.length - 1) [entries[i + 1], entries[i]] = [entries[i], entries[i + 1]];
@@ -385,9 +417,20 @@ function updateLangHint() {
   const code = $("lang").value;
   const v = variants.get(code);
   showPreview(v || printing);
+  renderCheckLinks();
   if (v) hint(`${langInfo(code).label} printing found on Scryfall.`, "ok");
   else hint(`Scryfall has no ${langInfo(code).label} image for this edition — the English one will be shown, but links still filter by ${langInfo(code).label}.`, "warn");
 }
+
+function renderCheckLinks() {
+  if (!printing) { $("checkLinks").innerHTML = ""; return; }
+  const chosen = variants.get($("lang").value) || printing;
+  const probe = { name: printing.name, set_name: printing.set_name, cardmarket_id: chosen.cardmarket_id || printing.cardmarket_id,
+                  cardmarket_url: $("cmUrl").value.trim(), cardtrader_url: $("ctUrl").value.trim() };
+  $("checkLinks").innerHTML = `Check before adding: <a href="${escapeHtml(cardmarketUrl(probe))}" target="_blank" rel="noopener">Cardmarket ↗</a><a href="${escapeHtml(cardtraderUrl(probe))}" target="_blank" rel="noopener">CardTrader ↗</a>`;
+}
+$("cmUrl").addEventListener("input", renderCheckLinks);
+$("ctUrl").addEventListener("input", renderCheckLinks);
 
 function showPreview(card) {
   const img = cardImages(card, "normal")[0];
@@ -405,6 +448,9 @@ $("add").onclick = () => {
     set: printing.set,
     set_name: printing.set_name,
     collector_number: printing.collector_number,
+    cardmarket_id: chosen.cardmarket_id || printing.cardmarket_id || null,
+    ...($("cmUrl").value.trim() ? { cardmarket_url: $("cmUrl").value.trim() } : {}),
+    ...($("ctUrl").value.trim() ? { cardtrader_url: $("ctUrl").value.trim() } : {}),
     lang,
     finish: $("finish").value,
     condition: $("condition").value,
@@ -412,7 +458,7 @@ $("add").onclick = () => {
     notes: $("notes").value.trim(),
     added: new Date().toISOString().slice(0, 10),
   });
-  $("qty").value = 1; $("notes").value = "";
+  $("qty").value = 1; $("notes").value = ""; $("cmUrl").value = ""; $("ctUrl").value = "";
   markDirty(); renderRows();
   hint(`Added ${printing.name}. Remember to save.`, "ok");
 };

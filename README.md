@@ -25,6 +25,7 @@ After a save, GitHub Pages needs about a minute to rebuild. Without a token you 
 
 ## Notes
 
-- Cardmarket links use Scryfall's link to the exact printing, with language, minimum condition and foil filters added.
-- CardTrader links search by card name; the URL format is in `cardtraderUrl()` in `common.js` if you want to change it.
+- Cardmarket links open the exact printing through its Cardmarket product id, with no filters (Cardmarket's firewall blocked links with extra parameters).
+- CardTrader links use `/cards/<card-name>-<set-name>`, which CardTrader redirects to that printing.
+- If an automatic link lands on the wrong version, paste the exact link in Behind the Scenes (optional fields when adding, or the 🔗 button in the list). Custom links show in red there.
 - If Scryfall has no scan of the chosen language for an edition, the English image is shown; the links still filter by your language.
