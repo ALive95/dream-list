@@ -91,14 +91,18 @@ function cardmarketUrl(entry, card) {
 }
 
 // CardTrader: /cards/<card-name>-<set-name> redirects to that exact printing
-// (e.g. /cards/lightning-bolt-magic-2010). A link pasted in Behind the Scenes wins.
+// (e.g. /cards/lightning-bolt-magic-2010). CardTrader names promo series without the year
+// ("Judge Gift Cards", not "Judge Gift Cards 2014"), so the year is dropped for promo sets.
+// A link pasted in Behind the Scenes always wins.
 const ctSlug = (s) =>
   String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 function cardtraderUrl(entry, card) {
   if (entry.cardtrader_url) return entry.cardtrader_url;
   const name = (card && card.name) || entry.name;
-  const set = (card && card.set_name) || entry.set_name;
+  let set = (card && card.set_name) || entry.set_name;
+  const setType = (card && card.set_type) || entry.set_type;
+  if (set && setType === "promo") set = set.replace(/\s+\d{4}$/, "");
   if (!set) return `https://www.cardtrader.com/search?q=${encodeURIComponent(name)}`;
   return `https://www.cardtrader.com/cards/${ctSlug(name)}-${ctSlug(set)}`;
 }

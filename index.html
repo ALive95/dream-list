@@ -58,25 +58,50 @@
     color: var(--white);
     text-shadow: -2px 0 0 var(--ink), 2px 0 0 var(--ink), 0 -2px 0 var(--ink), 0 2px 0 var(--ink), 2px 2px 0 var(--ink), -2px -2px 0 var(--ink), 2px -2px 0 var(--ink), -2px 2px 0 var(--ink), 4px 4px 0 rgba(74, 59, 99, .4);
   }
-  .counter {
-    display: inline-block;
-    margin-top: 16px;
-    font-family: "Press Start 2P", monospace;
-    font-size: 11px;
-    padding: 8px 12px;
-    background: var(--white);
-    color: var(--red);
-    box-shadow: 0 0 0 var(--px) var(--ink), var(--px) var(--px) 0 var(--px) rgba(74,59,99,.35);
-  }
 
+  /* Columns: --eff is set from JS (the visitor's choice, capped by the screen width) */
   main {
-    max-width: 1280px;
+    --eff: 4; --gap-x: 36px;
     margin: 0 auto;
     padding: 24px 24px 160px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 290px));
+    grid-template-columns: repeat(var(--eff), minmax(0, 300px));
     justify-content: center;
-    gap: 48px 36px;
+    gap: 44px var(--gap-x);
+  }
+  main.dense { --gap-x: 22px; row-gap: 32px; }
+
+  /* View toolbar */
+  .toolbar { position: relative; z-index: 1; display: flex; justify-content: center; padding: 0 16px; pointer-events: none; }
+  .toolbar[hidden] { display: none; }
+  .tools {
+    pointer-events: auto;
+    display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: center; justify-content: center;
+    padding: 12px 16px;
+  }
+  .tool { display: flex; align-items: center; gap: 10px; }
+  .tool-label { font-family: "Press Start 2P", monospace; font-size: 9px; color: #7d6a99; }
+  .seg { display: flex; gap: 6px; }
+  .seg button {
+    font-family: "Press Start 2P", monospace; font-size: 9px; cursor: pointer;
+    min-width: 30px; padding: 7px 8px; border: 0;
+    color: var(--ink); background: #e3f1fa; box-shadow: 0 0 0 2px var(--ink);
+  }
+  .seg button:hover { background: #fff1c9; }
+  .seg button.on { background: var(--red); color: var(--white); }
+  .badge.price { display: none; background: #fff1c9; }
+  main[data-sort="desc"] .badge.price, main[data-sort="asc"] .badge.price { display: inline-block; }
+
+  /* Small cards (5–7 per row): tighter type */
+  .entry { container-type: inline-size; }
+  @container (max-width: 230px) {
+    .entry .name { font-size: 9px; }
+    .entry .set { font-size: 16px; }
+    .entry .badges { gap: 5px; }
+    .entry .badge { font-size: 14px; padding: 3px 5px 2px; }
+    .entry .notes { font-size: 16px; }
+    .entry .links { gap: 8px; }
+    .entry .links .btn { font-size: 6px; padding: 8px 3px; letter-spacing: 0; }
   }
 
   /* Pixel panel: square outline drawn with box-shadows, chunky offset shadow */
@@ -93,6 +118,7 @@
   }
 
   .entry { display: flex; flex-direction: column; gap: 12px; animation: float-in .6s steps(6) both; }
+  main.dense .panel.entry { padding: 10px; }
   @keyframes float-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
   /* Card image + tilt */
@@ -235,7 +261,8 @@
   /* ---------- Balloon hit area + banner ---------- */
   /* Page content sits above the balloon; empty space lets clicks through to it */
   header, main, footer { position: relative; z-index: 1; pointer-events: none; }
-  header .counter, main > *, footer a, footer button { pointer-events: auto; }
+  .toolbar .tools { pointer-events: auto; }
+  main > *, footer a, footer button { pointer-events: auto; }
   #balloonHit {
     position: fixed; left: 0; top: 0; z-index: 0;   /* behind the page content, above the sky */
     width: 84px; height: 108px;
@@ -243,6 +270,20 @@
     transform: translate(-200px, -200px);
   }
   #balloonHit:focus-visible { outline: 3px dashed var(--white); outline-offset: 4px; }
+  .guide-btn {
+    position: fixed; top: 16px; right: 16px; z-index: 20;
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    font-family: "Press Start 2P", monospace; font-size: 10px; letter-spacing: 1px;
+    padding: 8px 12px 8px 8px; color: var(--ink); background: var(--white); border: 0;
+    box-shadow: 0 0 0 3px var(--ink), 4px 4px 0 3px var(--red);
+  }
+  .guide-btn .q {
+    display: inline-grid; place-items: center; width: 20px; height: 20px;
+    background: var(--red); color: var(--white); box-shadow: 0 0 0 2px var(--ink);
+  }
+  .guide-btn:hover { background: #fff1c9; }
+  .guide-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 3px var(--ink), 1px 1px 0 3px var(--red); }
+  @media (max-width: 600px) { .guide-btn .label { display: none; } .guide-btn { padding: 6px; } }
   #balloonHit .banner {
     position: absolute; right: calc(100% - 22px); top: 86px;
     white-space: nowrap;
@@ -347,9 +388,23 @@
 
 <header>
   <h1>DREAM LIST</h1>
-  <p class="subtitle">Reading the card explains the card</p>
-  <div class="counter" id="counter">&nbsp;</div>
+  <p class="subtitle">Leggi la carta, spiega la carta</p>
 </header>
+
+<nav class="toolbar" id="toolbar" aria-label="View options" hidden>
+  <div class="panel tools">
+    <div class="tool"><span class="tool-label">PER ROW</span>
+      <div class="seg" id="colsSeg">
+        <button type="button" data-cols="3">3</button><button type="button" data-cols="4">4</button><button type="button" data-cols="5">5</button><button type="button" data-cols="6">6</button><button type="button" data-cols="7">7</button>
+      </div>
+    </div>
+    <div class="tool"><span class="tool-label">ORDER</span>
+      <div class="seg" id="sortSeg">
+        <button type="button" data-sort="list" title="The order of my list">DEFAULT</button><button type="button" data-sort="desc" title="Cardmarket price, high to low">€ ↓</button><button type="button" data-sort="asc" title="Cardmarket price, low to high">€ ↑</button>
+      </div>
+    </div>
+  </div>
+</nav>
 
 <main id="list">
   <div class="panel message"><span class="blink">loading the sky…</span></div>
@@ -358,8 +413,11 @@
 <footer><button type="button" class="footer-guide" id="footerGuide">how to buy · come comprare</button> &nbsp;·&nbsp; card data &amp; images from <a href="https://scryfall.com" target="_blank" rel="noopener">Scryfall</a></footer>
 
 <!-- Balloon in the sky: click to open the guide -->
-<button id="balloonHit" type="button" aria-label="Buying guide / Guida all'acquisto">
-  <span class="banner">GUIDE ✦ GUIDA</span>
+<button id="balloonHit" type="button" aria-label="Buying guide / Guida all'acquisto" tabindex="-1"></button>
+
+<!-- Guide button, pinned top right -->
+<button id="guideBtn" type="button" class="guide-btn" aria-label="Buying guide / Guida all'acquisto">
+  <span class="q">?</span><span class="label">GUIDE · GUIDA</span>
 </button>
 
 <!-- "First time?" prompt shown when a shop button is clicked -->
@@ -437,8 +495,8 @@
     <p data-lang="it">Evita sempre le carte <b>firmate</b> (signed), <b>alterate</b> (altered: dipinte a mano o con l'illustrazione estesa) o <b>gradate</b> (graded: sigillate in una custodia rigida con un voto, es. PSA o BGS). Su Cardmarket controlla le icone e il commento del venditore accanto a ogni offerta; su CardTrader usa i filtri Signed, Altered e Graded.</p>
 
     <h3><span class="num">6</span><span data-lang="en">Expensive cards (100 €+)</span><span data-lang="it">Carte costose (100 €+)</span></h3>
-    <p data-lang="en">Before buying, message the seller and ask for <b>"scans front and back"</b>: photos of the actual card, so you can see its real condition. Serious sellers are used to this request.</p>
-    <p data-lang="it">Prima di comprare, scrivi al venditore e chiedi <b>"scans front and back"</b> (scansioni fronte e retro): foto della carta vera, per vederne le reali condizioni. I venditori seri sono abituati a questa richiesta.</p>
+    <p data-lang="en">Before buying, you can message the seller and ask for <b>"scans front and back"</b>: photos of the actual card, so you can see its real condition. Serious sellers are used to this request.</p>
+    <p data-lang="it">Prima di comprare, puoi scrivere al venditore e chiedere <b>"scans front and back"</b> (scansioni fronte e retro): foto della carta vera, per vederne le reali condizioni. I venditori seri sono abituati a questa richiesta.</p>
 
     <div class="dialog-buttons" id="guideContinueWrap" hidden>
       <a class="btn alt" id="guideContinue" target="_blank" rel="noopener"><span data-lang="en">CONTINUE TO </span><span data-lang="it">CONTINUA SU </span><span class="site-upper"></span> ↗</a>
@@ -679,7 +737,6 @@
 /* ---------------- Dream list ---------------- */
 (async () => {
   const list = document.getElementById("list");
-  const counter = document.getElementById("counter");
 
   function showMessage(html) { list.innerHTML = `<div class="panel message">${html}</div>`; }
 
@@ -692,7 +749,6 @@
     return;
   }
   if (!Array.isArray(entries) || entries.length === 0) {
-    counter.textContent = "0 DREAMS";
     showMessage("no dreams yet…<br>the sky is clear ☁");
     return;
   }
@@ -725,9 +781,41 @@
     console.warn("Scryfall unavailable", e);
   }
 
-  const total = entries.reduce((n, e) => n + (Number(e.quantity) || 1), 0);
-  counter.textContent = `${entries.length} DREAM${entries.length === 1 ? "" : "S"} · ${total} CARD${total === 1 ? "" : "S"}`;
+  // Cardmarket reference price (EUR) from Scryfall, for the entry's finish.
+  // Non-English printings often have no price: fall back to the same set/number in English.
+  const priceFromCard = (card, finish) => {
+    if (!card || !card.prices) return null;
+    const p = card.prices;
+    const order = finish === "etched" ? [p.eur_etched, p.eur_foil, p.eur] : finish === "foil" ? [p.eur_foil, p.eur] : [p.eur, p.eur_foil];
+    const v = order.find((x) => x != null && x !== "");
+    return v == null ? null : parseFloat(v);
+  };
+  const needEnglish = entries.filter((e) => {
+    const c = cards.get(e.scryfall_id);
+    return c && c.lang !== "en" && priceFromCard(c, e.finish) == null;
+  });
+  const englishPrices = new Map();
+  if (needEnglish.length) {
+    try {
+      const data = await scryfall("/cards/collection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifiers: needEnglish.slice(0, 75).map((e) => {
+          const c = cards.get(e.scryfall_id);
+          return { set: c.set, collector_number: c.collector_number };
+        }) }),
+      });
+      for (const c of data.data) englishPrices.set(`${c.set}/${c.collector_number}`, c);
+    } catch {}
+  }
+  const priceOf = (entry, card) => {
+    const own = priceFromCard(card, entry.finish);
+    if (own != null || !card) return own;
+    return priceFromCard(englishPrices.get(`${card.set}/${card.collector_number}`), entry.finish);
+  };
+
   list.innerHTML = "";
+  const items = [];
 
   entries.forEach((entry, i) => {
     const card = cards.get(entry.scryfall_id);
@@ -739,6 +827,7 @@
     const setCode = ((card && card.set) || entry.set || "").toUpperCase();
     const cn = (card && card.collector_number) || entry.collector_number || "";
 
+    const price = priceOf(entry, card);
     const el = document.createElement("article");
     el.className = "panel entry";
     el.style.animationDelay = `${Math.min(i, 12) * 60}ms`;
@@ -770,6 +859,7 @@
         <span class="badge ${isFoil ? "foil-badge" : ""}">${escapeHtml(FINISHES[entry.finish] || "Non-foil")}</span>
         ${(Number(entry.quantity) || 1) > 1 ? `<span class="badge qty">×${Number(entry.quantity)}</span>` : ""}
         <span class="badge no">NO signed/altered</span>
+        <span class="badge price" title="Cardmarket price via Scryfall">${price != null ? "~" + price.toFixed(2).replace(".", ",") + " €" : "price n/a"}</span>
       </div>
       ${entry.notes ? `<p class="notes">${escapeHtml(entry.notes)}</p>` : ""}
       <div class="links">
@@ -802,7 +892,53 @@
     });
 
     list.appendChild(el);
+    items.push({ el, index: i, price });
   });
+
+  /* ---------- View options: cards per row and order ---------- */
+  const VIEW_KEY = "dreamlist.view";
+  let view = { cols: 4, sort: "list" };
+  try { view = { ...view, ...JSON.parse(localStorage.getItem(VIEW_KEY) || "{}") }; } catch {}
+  const saveView = () => { try { localStorage.setItem(VIEW_KEY, JSON.stringify(view)); } catch {} };
+
+  function layout() {
+    // the chosen number of columns, fewer if the screen is too narrow for cards of at least 150px
+    const gap = view.cols >= 5 ? 22 : 36;
+    const width = list.clientWidth - 48;
+    const fit = innerWidth < 560 ? 1 : Math.max(1, Math.floor((width + gap) / (150 + gap)));   // phones: one per row
+    const eff = Math.max(1, Math.min(view.cols, fit, items.length));
+    list.style.setProperty("--eff", eff);
+    list.classList.toggle("dense", view.cols >= 5);
+  }
+  function order() {
+    const sorted = [...items];
+    if (view.sort !== "list") {
+      const dir = view.sort === "desc" ? -1 : 1;
+      sorted.sort((a, b) => {
+        if (a.price == null && b.price == null) return a.index - b.index;
+        if (a.price == null) return 1;           // cards without a price go last
+        if (b.price == null) return -1;
+        return dir * (a.price - b.price) || a.index - b.index;
+      });
+    }
+    list.dataset.sort = view.sort;
+    list.append(...sorted.map((it) => it.el));
+  }
+  function syncButtons() {
+    document.querySelectorAll("#colsSeg button").forEach((b) => b.classList.toggle("on", +b.dataset.cols === view.cols));
+    document.querySelectorAll("#sortSeg button").forEach((b) => b.classList.toggle("on", b.dataset.sort === view.sort));
+  }
+  document.getElementById("colsSeg").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    view.cols = +b.dataset.cols; saveView(); syncButtons(); layout();
+  });
+  document.getElementById("sortSeg").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    view.sort = b.dataset.sort; saveView(); syncButtons(); order();
+  });
+  addEventListener("resize", layout);
+  document.getElementById("toolbar").hidden = false;
+  syncButtons(); layout(); order();
 })();
 </script>
 <script>
@@ -873,6 +1009,7 @@ const Guide = (() => {
   document.getElementById("guideContinue").addEventListener("click", () => hide(guideOverlay));
   document.getElementById("askNever").addEventListener("change", (e) => store.set(ASK_KEY, e.target.checked ? "1" : "0"));
   document.getElementById("balloonHit").addEventListener("click", () => openGuide());
+  document.getElementById("guideBtn").addEventListener("click", () => openGuide());
   document.getElementById("footerGuide").addEventListener("click", () => openGuide());
 
   for (const ov of [askOverlay, guideOverlay]) {

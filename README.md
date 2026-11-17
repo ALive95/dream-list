@@ -25,7 +25,7 @@ After a save, GitHub Pages needs about a minute to rebuild. Without a token you 
 
 ## Notes
 
-- The Dream List has a buying guide in English and Italian. It opens from the hot-air balloon, from the footer link, and from a prompt shown when a visitor clicks a shop button (they can tick "don't ask again"). The guide text is in `index.html`, inside `<div id="guideOverlay">`.
+- The Dream List has a buying guide in English and Italian. It opens from the button pinned at the top right, from the footer link, from a click on the hot-air balloon, and from a prompt shown when a visitor clicks a shop button (they can tick "don't ask again"). The guide text is in `index.html`, inside `<div id="guideOverlay">`.
 
 - Cardmarket links open the exact printing through its Cardmarket product id, with no filters (Cardmarket's firewall blocked links with extra parameters).
 - CardTrader links use `/cards/<card-name>-<set-name>`, which CardTrader redirects to that printing.

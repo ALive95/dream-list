@@ -277,11 +277,15 @@ async function loadEntries() {
   }
   dirty = false;
   renderRows();
-  const missing = entries.filter((e) => !e.cardmarket_id && e.scryfall_id);
+  const missing = entries.filter((e) => (!e.cardmarket_id || !e.set_type) && e.scryfall_id);
   if (missing.length) {
     try {
       const cards = await fetchCollection(missing.map((e) => e.scryfall_id));
-      for (const e of missing) { const c = cards.get(e.scryfall_id); if (c && c.cardmarket_id) e.cardmarket_id = c.cardmarket_id; }
+      for (const e of missing) {
+        const c = cards.get(e.scryfall_id);
+        if (c && c.cardmarket_id) e.cardmarket_id = c.cardmarket_id;
+        if (c && !e.set_type) e.set_type = c.set_type;
+      }
       renderRows();
     } catch {}
   }
@@ -425,7 +429,7 @@ function updateLangHint() {
 function renderCheckLinks() {
   if (!printing) { $("checkLinks").innerHTML = ""; return; }
   const chosen = variants.get($("lang").value) || printing;
-  const probe = { name: printing.name, set_name: printing.set_name, cardmarket_id: chosen.cardmarket_id || printing.cardmarket_id,
+  const probe = { name: printing.name, set_name: printing.set_name, set_type: printing.set_type, cardmarket_id: chosen.cardmarket_id || printing.cardmarket_id,
                   cardmarket_url: $("cmUrl").value.trim(), cardtrader_url: $("ctUrl").value.trim() };
   $("checkLinks").innerHTML = `Check before adding: <a href="${escapeHtml(cardmarketUrl(probe))}" target="_blank" rel="noopener">Cardmarket ↗</a><a href="${escapeHtml(cardtraderUrl(probe))}" target="_blank" rel="noopener">CardTrader ↗</a>`;
 }
@@ -447,6 +451,7 @@ $("add").onclick = () => {
     name: printing.name,
     set: printing.set,
     set_name: printing.set_name,
+    set_type: printing.set_type,
     collector_number: printing.collector_number,
     cardmarket_id: chosen.cardmarket_id || printing.cardmarket_id || null,
     ...($("cmUrl").value.trim() ? { cardmarket_url: $("cmUrl").value.trim() } : {}),
