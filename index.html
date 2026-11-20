@@ -98,7 +98,16 @@
   .seg button:hover { background: #fff1c9; }
   .seg button.on { background: var(--red); color: var(--white); }
   .badge.price { display: none; background: #fff1c9; }
-  main[data-sort="desc"] .badge.price, main[data-sort="asc"] .badge.price { display: inline-block; }
+  [data-show-price="1"] .badge.price { display: inline-block; }
+  .tool.then[hidden] { display: none; }
+  .seg button:disabled { opacity: .35; cursor: default; }
+  .seg button svg { width: 10px; height: 9px; vertical-align: -1px; }
+  .seg button svg path { fill: currentColor; }
+
+  /* Interest: five pixel hearts */
+  .interest { display: flex; gap: 3px; align-items: center; }
+  .interest svg { width: 14px; height: 12px; display: block; }
+  .heart-off { fill: #e6d9ec; } .heart-on { fill: var(--red); }
 
   /* Small cards (5–7 per row): tighter type */
   .entry { container-type: inline-size; }
@@ -124,6 +133,8 @@
     #list .entry .links .btn { font-size: 7px; padding: 7px 0; }
     #list .entry .links .long { display: none; }
     #list .entry .links .short { display: inline; }
+    #list .entry .interest { gap: 1px; }
+    #list .entry .interest svg { width: 9px; height: 8px; }
   }
 
   /* Pixel panel: square outline drawn with box-shadows, chunky offset shadow */
@@ -402,7 +413,6 @@
     padding: 7px 9px; border: 0; background: var(--white); color: var(--ink);
     box-shadow: 0 0 0 2px var(--ink);
   }
-  [data-sort="desc"] .badge.price, [data-sort="asc"] .badge.price { display: inline-block; }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -439,9 +449,10 @@
       <div class="seg" id="colsSeg"></div>
     </div>
     <div class="tool"><span class="tool-label">ORDER</span>
-      <div class="seg" id="sortSeg">
-        <button type="button" data-sort="list" title="The order of my list">DEFAULT</button><button type="button" data-sort="desc" title="Cardmarket price, high to low">€ ↓</button><button type="button" data-sort="asc" title="Cardmarket price, low to high">€ ↑</button>
-      </div>
+      <div class="seg" id="sortSeg"></div>
+    </div>
+    <div class="tool then" id="thenTool" hidden><span class="tool-label">THEN</span>
+      <div class="seg" id="sortSeg2"></div>
     </div>
   </div>
 </nav>
@@ -862,6 +873,11 @@
     return priceFromCard(englishPrices.get(`${card.set}/${card.collector_number}`), entry.finish);
   };
 
+  // 7×6 pixel heart
+  const HEART_PX = [".XX.XX.", "XXXXXXX", "XXXXXXX", ".XXXXX.", "..XXX..", "...X..."];
+  const HEART_PATH = HEART_PX.flatMap((row, y) => [...row].map((c, x) => (c === "X" ? `M${x} ${y}h1v1h-1z` : ""))).join("");
+  const heartSvg = (on) => `<svg viewBox="0 0 7 6" shape-rendering="crispEdges" aria-hidden="true"><path class="${on ? "heart-on" : "heart-off"}" d="${HEART_PATH}"/></svg>`;
+
   list.innerHTML = "";
   const items = [];
 
@@ -876,6 +892,7 @@
     const cn = (card && card.collector_number) || entry.collector_number || "";
 
     const price = priceOf(entry, card);
+    const interest = Math.min(5, Math.max(1, Number(entry.interest) || 3));
     const el = document.createElement("article");
     el.className = "panel entry";
     el.style.animationDelay = `${Math.min(i, 12) * 60}ms`;
@@ -900,6 +917,7 @@
       <div>
         <a class="name" href="${escapeHtml((card && card.scryfall_uri) || "https://scryfall.com/search?q=" + encodeURIComponent('!"' + entry.name + '"'))}" target="_blank" rel="noopener">${escapeHtml(entry.name)}</a>
         <div class="set">${escapeHtml(setName)} · ${escapeHtml(setCode)} #${escapeHtml(cn)}</div>
+        <div class="interest" title="How much I want it: ${interest}/5">${[1, 2, 3, 4, 5].map((n) => heartSvg(n <= interest)).join("")}</div>
       </div>
       <div class="badges">
         <span class="badge">${escapeHtml(lang.label)}</span>
@@ -940,13 +958,16 @@
     });
 
     list.appendChild(el);
-    items.push({ el, index: i, price, images });
+    items.push({ el, index: i, price, images, interest });
   });
 
   /* ---------- View options: cards per row and order ---------- */
   const VIEW_KEY = "dreamlist.view";
   let view = { cols: 4, phoneCols: 1, sort: "list" };   // phones keep their own setting
   try { view = { ...view, ...JSON.parse(localStorage.getItem(VIEW_KEY) || "{}") }; } catch {}
+  view.sort = { desc: "price-desc", asc: "price-asc" }[view.sort] || view.sort;   // older saved choices
+  if (!["list", "int-desc", "int-asc", "price-desc", "price-asc"].includes(view.sort)) view.sort = "list";
+  if (!view.sort2 || view.sort === "list") view.sort2 = "none";
   const saveView = () => { try { localStorage.setItem(VIEW_KEY, JSON.stringify(view)); } catch {} };
 
   const isPhone = () => innerWidth < 560;
@@ -982,24 +1003,48 @@
     list.classList.toggle("images-only", phone);
     if (!phone) closeDetail();
   }
+  // Sort keys: "list" (my order), "int-desc", "int-asc", "price-desc", "price-asc"
+  const SORTS = [
+    { key: "list", label: "DEFAULT", title: "The order of my list" },
+    { key: "int-desc", label: `${heartSvg(true)} ↓`, title: "Interest, highest first" },
+    { key: "int-asc", label: `${heartSvg(true)} ↑`, title: "Interest, lowest first" },
+    { key: "price-desc", label: "€ ↓", title: "Cardmarket price, high to low" },
+    { key: "price-asc", label: "€ ↑", title: "Cardmarket price, low to high" },
+  ];
+  const family = (k) => k.split("-")[0];
+  function compareBy(key, a, b) {
+    if (!key || key === "list" || key === "none") return 0;
+    const dir = key.endsWith("desc") ? -1 : 1;
+    if (family(key) === "int") return dir * (a.interest - b.interest);
+    if (a.price == null && b.price == null) return 0;
+    if (a.price == null) return 1;               // cards without a price go last
+    if (b.price == null) return -1;
+    return dir * (a.price - b.price);
+  }
   function order() {
-    const sorted = [...items];
-    if (view.sort !== "list") {
-      const dir = view.sort === "desc" ? -1 : 1;
-      sorted.sort((a, b) => {
-        if (a.price == null && b.price == null) return a.index - b.index;
-        if (a.price == null) return 1;           // cards without a price go last
-        if (b.price == null) return -1;
-        return dir * (a.price - b.price) || a.index - b.index;
-      });
-    }
-    list.dataset.sort = view.sort;
+    const sorted = [...items].sort((a, b) =>
+      compareBy(view.sort, a, b) || compareBy(view.sort2, a, b) || a.index - b.index);
+    const showPrice = [view.sort, view.sort2].some((k) => k && family(k) === "price") ? "1" : "0";
+    list.dataset.showPrice = showPrice;
+    cardOverlay.dataset.showPrice = showPrice;
     list.append(...sorted.map((it) => it.el));
+  }
+  function buildSortButtons() {
+    document.getElementById("sortSeg").innerHTML = SORTS.map((o) =>
+      `<button type="button" data-sort="${o.key}" title="${o.title}">${o.label}</button>`).join("");
+    document.getElementById("sortSeg2").innerHTML = [{ key: "none", label: "—", title: "No second ordering" }, ...SORTS.slice(1)].map((o) =>
+      `<button type="button" data-sort="${o.key}" title="${o.title}">${o.label}</button>`).join("");
   }
   function syncButtons() {
     const current = isPhone() ? view.phoneCols : view.cols;
     document.querySelectorAll("#colsSeg button").forEach((b) => b.classList.toggle("on", +b.dataset.cols === current));
     document.querySelectorAll("#sortSeg button").forEach((b) => b.classList.toggle("on", b.dataset.sort === view.sort));
+    // the second ordering only makes sense after interest or price, and on the other property
+    document.getElementById("thenTool").hidden = view.sort === "list";
+    document.querySelectorAll("#sortSeg2 button").forEach((b) => {
+      b.disabled = b.dataset.sort !== "none" && family(b.dataset.sort) === family(view.sort);
+      b.classList.toggle("on", b.dataset.sort === view.sort2);
+    });
   }
   document.getElementById("colsSeg").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b) return;
@@ -1008,7 +1053,13 @@
   });
   document.getElementById("sortSeg").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b) return;
-    view.sort = b.dataset.sort; saveView(); syncButtons(); order();
+    view.sort = b.dataset.sort;
+    if (view.sort === "list" || family(view.sort2) === family(view.sort)) view.sort2 = "none";
+    saveView(); syncButtons(); order();
+  });
+  document.getElementById("sortSeg2").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b || b.disabled) return;
+    view.sort2 = b.dataset.sort; saveView(); syncButtons(); order();
   });
   /* ---------- Phones: tap a card to see it with its details and links ---------- */
   const cardOverlay = document.getElementById("cardOverlay");
@@ -1026,7 +1077,6 @@
         clone.querySelector(".card img").src = item.images[face];
       });
     }
-    cardOverlay.dataset.sort = view.sort;
     cardOverlay.hidden = false;
     document.body.style.overflow = "hidden";
     cardOverlay.querySelector(".detail-box").scrollTop = 0;
@@ -1053,7 +1103,7 @@
 
   addEventListener("resize", layout);
   document.getElementById("toolbar").hidden = false;
-  syncButtons(); layout(); order();
+  buildSortButtons(); syncButtons(); layout(); order();
 })();
 </script>
 <script>

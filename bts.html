@@ -58,6 +58,17 @@
   td input, td select { padding: 4px 6px; }
   td .qty { width: 58px; }
   td select { min-width: 72px; }
+  .span1 { grid-column: span 1; }
+  .hearts { display: inline-flex; gap: 1px; white-space: nowrap; }
+  .hearts button {
+    border: 0; box-shadow: none; background: none; padding: 0 1px; cursor: pointer;
+    font-size: 19px; line-height: 1; color: #e2d4ea;
+  }
+  .hearts button.on { color: var(--red); }
+  .hearts button:hover { transform: scale(1.15); }
+  .hearts button:active { transform: none; }
+  .field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+  .field .hearts { padding: 4px 0; }
   td .act { display: flex; gap: 4px; }
   td .act button { padding: 2px 8px; box-shadow: none; }
   .checklinks { font-size: 13px; color: var(--muted); }
@@ -115,10 +126,13 @@
         <label class="span2">Min. condition
           <select id="condition"></select>
         </label>
-        <label class="span2">Quantity
+        <label class="span1">Qty
           <input id="qty" type="number" min="1" value="1">
         </label>
-        <label class="span4">Notes
+        <div class="span2 field">Interest (1–5)
+          <span class="hearts" id="addInterest" data-value="3"></span>
+        </div>
+        <label class="span3">Notes
           <input id="notes" placeholder="e.g. max 25 €, signed is ok…">
         </label>
         <label class="span3">Cardmarket link (optional)
@@ -140,7 +154,7 @@
     <h2>CURRENT LIST</h2>
     <table>
       <thead><tr>
-        <th></th><th>Card</th><th class="hide-sm">Lang</th><th>Finish</th><th>Cond.</th><th>Qty</th><th class="hide-sm">Notes</th><th>Links</th><th></th>
+        <th></th><th>Card</th><th class="hide-sm">Lang</th><th>Finish</th><th>Cond.</th><th>Interest</th><th>Qty</th><th class="hide-sm">Notes</th><th>Links</th><th></th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table>
@@ -296,9 +310,15 @@ function optionsHtml(list, selected, valueKey = "code", labelFn = (o) => o.label
   return list.map((o) => `<option value="${o[valueKey]}" ${o[valueKey] === selected ? "selected" : ""}>${escapeHtml(labelFn(o))}</option>`).join("");
 }
 
+const interestOf = (e) => Math.min(5, Math.max(1, Number(e.interest) || 3));
+function heartsHtml(v) {
+  return `<span class="hearts">${[1, 2, 3, 4, 5].map((n) =>
+    `<button type="button" data-heart="${n}" class="${n <= v ? "on" : ""}" title="Interest ${n}/5">♥</button>`).join("")}</span>`;
+}
+
 function renderRows() {
   const tb = $("rows");
-  if (!entries.length) { tb.innerHTML = `<tr><td colspan="9" class="empty">No cards yet.</td></tr>`; return; }
+  if (!entries.length) { tb.innerHTML = `<tr><td colspan="10" class="empty">No cards yet.</td></tr>`; return; }
   tb.innerHTML = entries.map((e, i) => `
     <tr data-i="${i}">
       <td><img loading="lazy" alt="" src="https://api.scryfall.com/cards/${encodeURIComponent(e.scryfall_id)}?format=image&version=small"></td>
@@ -306,6 +326,7 @@ function renderRows() {
       <td class="hide-sm">${escapeHtml(langInfo(e.lang).label)}</td>
       <td>${escapeHtml(FINISHES[e.finish] || e.finish)}</td>
       <td><select data-f="condition">${optionsHtml(CONDITIONS, e.condition, "code", (c) => c.code)}</select></td>
+      <td>${heartsHtml(interestOf(e))}</td>
       <td><input class="qty" data-f="quantity" type="number" min="1" value="${Number(e.quantity) || 1}"></td>
       <td class="hide-sm"><input data-f="notes" value="${escapeHtml(e.notes || "")}"></td>
       <td class="links">
@@ -325,6 +346,14 @@ $("rows").addEventListener("change", (ev) => {
   markDirty();
 });
 $("rows").addEventListener("click", (ev) => {
+  const heart = ev.target.closest("[data-heart]");
+  if (heart) {
+    const e = entries[+heart.closest("tr").dataset.i];
+    e.interest = +heart.dataset.heart;
+    heart.parentElement.querySelectorAll("button").forEach((b) => b.classList.toggle("on", +b.dataset.heart <= e.interest));
+    markDirty();
+    return;
+  }
   const a = ev.target.dataset.a, tr = ev.target.closest("tr");
   if (!a || !tr) return;
   const i = +tr.dataset.i;
@@ -459,11 +488,12 @@ $("add").onclick = () => {
     lang,
     finish: $("finish").value,
     condition: $("condition").value,
+    interest: +$("addInterest").dataset.value || 3,
     quantity: Math.max(1, parseInt($("qty").value) || 1),
     notes: $("notes").value.trim(),
     added: new Date().toISOString().slice(0, 10),
   });
-  $("qty").value = 1; $("notes").value = ""; $("cmUrl").value = ""; $("ctUrl").value = "";
+  $("qty").value = 1; $("notes").value = ""; setAddInterest(3); $("cmUrl").value = ""; $("ctUrl").value = "";
   markDirty(); renderRows();
   hint(`Added ${printing.name}. Remember to save.`, "ok");
 };
@@ -491,8 +521,19 @@ $("copy").onclick = async () => {
 $("reload").onclick = () => { if (!dirty || confirm("Discard unsaved changes?")) loadEntries(); };
 addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
 
+/* ---------- Interest picker in the add form ---------- */
+function setAddInterest(v) {
+  $("addInterest").dataset.value = v;
+  $("addInterest").innerHTML = heartsHtml(v).replace(/^<span class="hearts">|<\/span>$/g, "");
+}
+$("addInterest").addEventListener("click", (ev) => {
+  const b = ev.target.closest("[data-heart]");
+  if (b) setAddInterest(+b.dataset.heart);
+});
+
 /* ---------- Init ---------- */
 $("condition").innerHTML = optionsHtml(CONDITIONS, "NM", "code", (c) => `${c.code === "ANY" ? "" : c.code + " · "}${c.label}`);
+setAddInterest(3);
 fillSettings();
 loadEntries();
 </script>
