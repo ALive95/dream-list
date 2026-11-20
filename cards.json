@@ -11,7 +11,10 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "cardmarket_id": 15789,
+    "set_type": "promo",
+    "interest": 4
   },
   {
     "uid": "f084e404-07e1-419d-9741-b2559b299cb2",
@@ -25,7 +28,10 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "cardmarket_id": 10655,
+    "set_type": "expansion",
+    "interest": 4
   },
   {
     "uid": "bb72d4c5-d0ad-4302-93b3-729b57f9608d",
@@ -39,7 +45,10 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "cardmarket_id": 10568,
+    "set_type": "expansion",
+    "interest": 5
   },
   {
     "uid": "2fb21e8a-0e8e-448b-96e5-49e61069a4a9",
@@ -53,7 +62,10 @@
     "condition": "GD",
     "quantity": 1,
     "notes": "No signed/artwork",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "cardmarket_id": 11740,
+    "set_type": "expansion",
+    "interest": 4
   },
   {
     "uid": "57b670ca-fabb-444e-9f7b-ed0bce7d10e3",
@@ -67,7 +79,10 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "No signed/artwork",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "cardmarket_id": 266983,
+    "set_type": "promo",
+    "interest": 5
   },
   {
     "uid": "084c2105-0518-4c9e-b564-5c4f34854bd9",
@@ -83,7 +98,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "e7ce16c7-9cbd-4cfe-a45a-58b9f93ba489",
@@ -99,7 +115,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "460641fc-aa5c-41d9-adb1-3c3ececb0318",
@@ -115,7 +132,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "07e67652-544f-4658-ad02-c10a57798c8b",
@@ -131,7 +149,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "600971fd-c8eb-426d-9073-f88172f345ae",
@@ -147,7 +166,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "1179e209-831b-4838-9bf0-7ea4289c5871",
@@ -163,7 +183,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "c1f5210c-05ee-4a21-9d65-9978137eeccc",
@@ -179,7 +200,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "db24a11b-84c5-45ec-8998-5433b6196013",
@@ -195,7 +217,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "865f8b22-9993-4f15-b66d-55d81af1c7be",
@@ -211,7 +234,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "642f3982-ed0b-43aa-8c7c-041b2ab3cdec",
@@ -227,7 +251,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "b92d54dd-8692-4c6f-abe7-caa58b3009bc",
@@ -243,7 +268,8 @@
     "condition": "NM",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 5
   },
   {
     "uid": "acf632d1-962a-495c-a026-b35d7a90bc8a",
@@ -259,7 +285,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "57ce5915-06fc-4ed7-bae2-a41195968262",
@@ -275,7 +302,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "5df805e8-dbb4-4003-8581-e250e8656a02",
@@ -291,7 +319,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "ff3b79a7-3bc6-493b-b367-314eea61f8a6",
@@ -307,7 +336,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "83e5163e-59da-4d58-942f-522c52d26db1",
@@ -323,7 +353,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "53477a60-bb3c-422b-baa1-5ddee0937c77",
@@ -339,7 +370,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "bc376d4e-4acf-4ac6-8a12-d0552bdd4e1c",
@@ -355,7 +387,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "2feeb218-8e6a-4f79-ad63-2c4679934824",
@@ -371,7 +404,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 4
   },
   {
     "uid": "fd8855ff-431e-4140-9a52-53a5063f355c",
@@ -387,7 +421,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "7b55a16f-2c13-41f6-83c3-4f2c1f8d6221",
@@ -403,7 +438,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "d29e236a-c3ca-47a9-a06f-56d490e0200a",
@@ -419,7 +455,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "7fae7956-3175-4335-9997-5de2a0953fbb",
@@ -435,7 +472,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 4
   },
   {
     "uid": "7efdd086-91e6-4b3f-85a9-d571458f74f1",
@@ -451,7 +489,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "a4a9c2cf-6b8f-41cf-85d4-b55d57a30b30",
@@ -467,7 +506,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "f53fb009-deda-45e7-a4b7-97cb47fe42c1",
@@ -483,7 +523,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "7350c3d8-2b2c-4878-94e6-6baa9daea9c9",
@@ -497,9 +538,10 @@
     "lang": "en",
     "finish": "foil",
     "condition": "EX",
-    "quantity": 1,
+    "quantity": 2,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 5
   },
   {
     "uid": "4536ae15-b847-468e-be9a-d95ab4c9a5c8",
@@ -515,7 +557,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "f8b81e44-39c2-4cb8-81da-7336649c5034",
@@ -531,7 +574,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "d174d402-90cc-4281-a94d-540e1ff7c393",
@@ -547,7 +591,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "bc72a546-f8a5-4678-8d63-3f8b00cfe002",
@@ -563,7 +608,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "57cd32f6-0296-45ec-8de9-a94dd278c6c0",
@@ -579,7 +625,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "14294534-9eaf-486f-a631-0213b92e3af6",
@@ -595,7 +642,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "58ef61ac-a8e2-4a10-92a0-fc84a2e54171",
@@ -611,7 +659,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "df001fe0-b2d8-4c80-8522-b02ef6b37bf6",
@@ -627,7 +676,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "d7b89484-8e54-4553-b223-3dc1770332f5",
@@ -643,7 +693,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "86bc1b25-f05d-45d5-a3d0-e4da831287a0",
@@ -659,7 +710,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "2faf2a76-22a9-4747-af7e-9d14ae0d94e8",
@@ -675,7 +727,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "9b0b108a-c088-4485-9b26-2b8f4d17320b",
@@ -691,7 +744,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "69ef9fb8-e045-4077-9a73-feb3fb18d62a",
@@ -707,7 +761,8 @@
     "condition": "NM",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 5
   },
   {
     "uid": "48650efa-0ca4-4469-8eb6-57ad1b30176a",
@@ -739,23 +794,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
-  },
-  {
-    "uid": "d88a7cb4-e621-4906-bcec-1d1ac7157501",
-    "scryfall_id": "5e3d3024-bef2-4b50-ab84-8ae2a23cdf27",
-    "name": "Soratami Cloudskater",
-    "set": "chk",
-    "set_name": "Champions of Kamigawa",
-    "set_type": "expansion",
-    "collector_number": "86",
-    "cardmarket_id": 12193,
-    "lang": "en",
-    "finish": "foil",
-    "condition": "EX",
-    "quantity": 1,
-    "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 4
   },
   {
     "uid": "f3dd2dea-e55e-468e-ad06-de6303b75716",
@@ -771,7 +811,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "bcec0ede-fcf4-4a96-b9ce-5a993a6de7da",
@@ -787,7 +828,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 3
   },
   {
     "uid": "0fba298b-b646-4a5d-8958-0d1b69ee741e",
@@ -803,7 +845,8 @@
     "condition": "NM",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 4
   },
   {
     "uid": "971cc793-845e-4a40-99fe-aea303bebc48",
@@ -819,7 +862,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "8dabde04-b0d8-4c7b-ac2b-8e8f20aa55e1",
@@ -851,7 +895,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "d74b7e15-b84e-4dc5-a50a-21db20b32f68",
@@ -867,7 +912,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "df33d6a7-ebfa-453f-9c4e-1b0e9ef4271d",
@@ -883,7 +929,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 5
   },
   {
     "uid": "f513aed7-cad6-4926-8784-bbc296564ae7",
@@ -899,7 +946,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 3
   },
   {
     "uid": "c4d402e7-aedd-420a-aa12-5671245952d1",
@@ -931,7 +979,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "66ec72a2-635c-48ac-bdcf-72a6deaedd2a",
@@ -947,7 +996,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 5
   },
   {
     "uid": "0dbde578-5df2-4b6a-b0c0-75bdd8cf317f",
@@ -963,7 +1013,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 5
   },
   {
     "uid": "dc9e26b6-d445-4789-b296-7f5005b5ad27",
@@ -979,7 +1030,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 1
   },
   {
     "uid": "371cdec6-315b-44ea-b7a6-bab98513755f",
@@ -995,7 +1047,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 4
   },
   {
     "uid": "763a1cd4-87dd-4da6-a1fc-3876a1c9e94e",
@@ -1011,7 +1064,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 5
   },
   {
     "uid": "93801b91-b43b-406d-8098-e8f290a6c15c",
@@ -1027,7 +1081,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 5
   },
   {
     "uid": "a3da2e66-59ac-4508-80eb-a7a426ead785",
@@ -1043,7 +1098,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "8e84af7d-d699-465d-8e51-a53e0bbce190",
@@ -1059,7 +1115,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 2
   },
   {
     "uid": "b25d61c3-cf79-4206-9292-23058e1780e5",
@@ -1075,7 +1132,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 5
   },
   {
     "uid": "c4ec9a80-5a3b-40ef-bc7b-660a8670e393",
@@ -1091,7 +1149,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 4
   },
   {
     "uid": "c829a8b4-840e-4dfb-8f4c-2d95ddd899a8",
@@ -1107,7 +1166,8 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 4
   },
   {
     "uid": "38b5097b-db7b-43b1-bdc3-3132cb68dc47",
@@ -1123,6 +1183,7 @@
     "condition": "EX",
     "quantity": 1,
     "notes": "",
-    "added": "2026-11-17"
+    "added": "2026-11-17",
+    "interest": 5
   }
 ]
