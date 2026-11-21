@@ -299,7 +299,7 @@
     "finish": "foil",
     "condition": "GD",
     "quantity": 1,
-    "notes": "No signed/artwork",
+    "notes": "",
     "added": "2026-11-17",
     "cardmarket_id": 11740,
     "set_type": "expansion",
@@ -316,7 +316,7 @@
     "finish": "foil",
     "condition": "EX",
     "quantity": 1,
-    "notes": "No signed/artwork",
+    "notes": "",
     "added": "2026-11-17",
     "cardmarket_id": 266983,
     "set_type": "promo",
@@ -1015,7 +1015,7 @@
     "finish": "foil",
     "condition": "NM",
     "quantity": 1,
-    "notes": "English or Japanese",
+    "notes": "",
     "added": "2026-11-17"
   },
   {
@@ -1116,7 +1116,7 @@
     "finish": "foil",
     "condition": "NM",
     "quantity": 1,
-    "notes": "English, Italian or Japanese",
+    "notes": "",
     "added": "2026-11-17"
   },
   {
