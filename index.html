@@ -1043,11 +1043,12 @@ const tr = (en, it) => `<span data-lang="en">${en}</span><span data-lang="it">${
 
   /* ---------- View options: cards per row and order ---------- */
   const VIEW_KEY = "dreamlist.view";
-  let view = { cols: 4, phoneCols: 1, sort: "list" };   // phones keep their own setting
+  // defaults: 5 per row (2 on phones), most-wanted first, then cheapest first; phones keep their own per-row setting
+  let view = { cols: 5, phoneCols: 2, sort: "int-desc", sort2: "price-asc" };
   try { view = { ...view, ...JSON.parse(localStorage.getItem(VIEW_KEY) || "{}") }; } catch {}
   view.sort = { desc: "price-desc", asc: "price-asc" }[view.sort] || view.sort;   // older saved choices
   if (!["list", "int-desc", "int-asc", "price-desc", "price-asc"].includes(view.sort)) view.sort = "list";
-  if (!view.sort2 || view.sort === "list") view.sort2 = "none";
+  if (!view.sort2 || view.sort === "list" || view.sort2.split("-")[0] === view.sort.split("-")[0]) view.sort2 = "none";
   const saveView = () => { try { localStorage.setItem(VIEW_KEY, JSON.stringify(view)); } catch {} };
 
   const isPhone = () => innerWidth < 560;
