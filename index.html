@@ -104,8 +104,7 @@
   }
   .seg button:hover { background: #fff1c9; }
   .seg button.on { background: var(--red); color: var(--white); }
-  .badge.price { display: none; background: #fff1c9; }
-  [data-show-price="1"] .badge.price { display: inline-block; }
+  .badge.price { background: #fff1c9; }   /* always shown */
   .tool.then[hidden] { display: none; }
   .seg button:disabled { opacity: .35; cursor: default; }
   .seg button svg { width: 10px; height: 9px; vertical-align: -1px; }
@@ -1075,9 +1074,6 @@ const tr = (en, it) => `<span data-lang="en">${en}</span><span data-lang="it">${
   function order() {
     const sorted = [...items].sort((a, b) =>
       compareBy(view.sort, a, b) || compareBy(view.sort2, a, b) || a.index - b.index);
-    const showPrice = [view.sort, view.sort2].some((k) => k && family(k) === "price") ? "1" : "0";
-    list.dataset.showPrice = showPrice;
-    cardOverlay.dataset.showPrice = showPrice;
     list.append(...sorted.map((it) => it.el));
   }
   function buildSortButtons() {
