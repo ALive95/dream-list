@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it" data-ui="it">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,6 +7,10 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Dream List</title>
+<script>
+  // interface language: Italian unless the visitor picked English
+  try { const l = localStorage.getItem("dreamlist.lang"); if (l === "en" || l === "it") { document.documentElement.dataset.ui = l; document.documentElement.lang = l; } } catch (e) {}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
@@ -400,6 +404,36 @@
   .compare figcaption { margin-top: 6px; font-size: 19px; line-height: 1.15; }
   .compare .good { color: #2f8a5b; } .compare .bad { color: var(--red); }
 
+  /* ---------- Bookings (visitors only) ---------- */
+  .booking { display: none; }
+  html[data-booking="on"] .booking { display: block; }
+  html:not([data-booking="on"]) .needs-booking { display: none; }
+  .booking .btn.gift { width: 100%; background: #fff1c9; color: var(--ink); margin-top: 4px; }
+  .booking .btn.gift:disabled { opacity: .6; cursor: default; }
+  .booking .note { margin: 4px 0 0; font-size: 19px; line-height: 1.1; color: #7d6a99; }
+  .booking .note.mine { color: #2f8a5b; }
+  .booking .cancel { font: inherit; color: var(--red); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
+  .ribbon {
+    display: none; position: absolute; inset: 0; z-index: 5; place-items: center; pointer-events: none;
+    background: rgba(74, 59, 99, .5);
+  }
+  .ribbon .stamp {
+    transform: rotate(-12deg); text-align: center;
+    font-family: "Press Start 2P", monospace; font-size: clamp(8px, 8cqi, 22px); line-height: 1.5; letter-spacing: 2px;
+    padding: .6em .9em; color: var(--white); background: var(--red);
+    box-shadow: 0 0 0 3px var(--white), 0 0 0 6px var(--ink), 7px 7px 0 6px rgba(0, 0, 0, .3);
+  }
+  .ribbon .stamp small { display: none; font-size: .55em; letter-spacing: 1px; }
+  .entry.is-mine .ribbon .stamp small { display: block; }
+  .entry.is-booked .ribbon { display: grid; }
+  .entry.is-mine .ribbon .stamp { background: #2f8a5b; }
+  .entry.is-booked .card img { filter: grayscale(.9) brightness(.85); }
+  .entry.is-booked .card.foil::after, .entry.is-booked .card.foil::before, .entry.is-booked .sparkle { display: none; }
+  @container (max-width: 230px) {
+    #list .entry .booking .btn.gift { font-size: 6px; padding: 8px 2px; }
+    #list .entry .booking .note { font-size: 15px; }
+  }
+
   /* ---------- Phones: card images only; tap opens the full card ---------- */
   main.images-only { row-gap: 16px; }
   main.images-only .panel.entry { background: none; box-shadow: none; padding: 0; gap: 0; }
@@ -448,30 +482,33 @@
 
 <nav class="toolbar" id="toolbar" aria-label="View options" hidden>
   <div class="panel tools">
-    <div class="tool"><span class="tool-label">PER ROW</span>
+    <div class="tool"><span class="tool-label"><span data-lang="en">PER ROW</span><span data-lang="it">PER RIGA</span></span>
       <div class="seg" id="colsSeg"></div>
     </div>
-    <div class="tool"><span class="tool-label">ORDER</span>
+    <div class="tool"><span class="tool-label"><span data-lang="en">ORDER</span><span data-lang="it">ORDINE</span></span>
       <div class="seg" id="sortSeg"></div>
     </div>
-    <div class="tool then" id="thenTool" hidden><span class="tool-label">THEN</span>
+    <div class="tool then" id="thenTool" hidden><span class="tool-label"><span data-lang="en">THEN</span><span data-lang="it">POI</span></span>
       <div class="seg" id="sortSeg2"></div>
+    </div>
+    <div class="tool"><span class="tool-label"><span data-lang="en">LANGUAGE</span><span data-lang="it">LINGUA</span></span>
+      <div class="seg langs-seg"><button type="button" data-setlang="it">IT</button><button type="button" data-setlang="en">EN</button></div>
     </div>
   </div>
 </nav>
 
 <main id="list">
-  <div class="panel message"><span class="blink">loading the sky…</span></div>
+  <div class="panel message"><span class="blink"><span data-lang="en">loading the sky…</span><span data-lang="it">carico il cielo…</span></span></div>
 </main>
 
-<footer><button type="button" class="footer-guide" id="footerGuide">how to buy · come comprare</button> &nbsp;·&nbsp; card data &amp; images from <a href="https://scryfall.com" target="_blank" rel="noopener">Scryfall</a></footer>
+<footer><button type="button" class="footer-guide" id="footerGuide"><span data-lang="en">how to buy</span><span data-lang="it">come comprare</span></button> &nbsp;·&nbsp; <span data-lang="en">card data &amp; images from</span><span data-lang="it">dati e immagini delle carte da</span> <a href="https://scryfall.com" target="_blank" rel="noopener">Scryfall</a></footer>
 
 <!-- Balloon in the sky: click to open the guide -->
 <button id="balloonHit" type="button" aria-label="Buying guide / Guida all'acquisto" tabindex="-1"></button>
 
 <!-- Guide button, pinned top right -->
 <button id="guideBtn" type="button" class="guide-btn" aria-label="Buying guide / Guida all'acquisto">
-  <span class="q">?</span><span class="label">GUIDE · GUIDA</span>
+  <span class="q">?</span><span class="label"><span data-lang="en">GUIDE</span><span data-lang="it">GUIDA</span></span>
 </button>
 
 <!-- "First time?" prompt shown when a shop button is clicked -->
@@ -539,7 +576,7 @@
       </tbody>
     </table>
     <p data-lang="en">Careful: on Cardmarket <i>Light Played</i> is worse than <i>Good</i>, and <i>Played</i> means something different on the two sites. On my list, <b>NM+</b> means Near Mint or better; <b>ANY COND.</b> means condition doesn't matter.</p>
-    <p data-lang="it">Attenzione: su Cardmarket <i>Light Played</i> è peggio di <i>Good</i>, e <i>Played</i> indica cose diverse sui due siti. Nella mia lista, <b>NM+</b> significa Near Mint o migliore; <b>ANY COND.</b> significa che la condizione non importa.</p>
+    <p data-lang="it">Attenzione: su Cardmarket <i>Light Played</i> è peggio di <i>Good</i>, e <i>Played</i> indica cose diverse sui due siti. Nella mia lista, <b>NM+</b> significa Near Mint o migliore; <b>QUALSIASI</b> significa che la condizione non importa.</p>
 
     <h3><span class="num">3</span><span data-lang="en">The edition matters</span><span data-lang="it">L'edizione è importante</span></h3>
     <p data-lang="en">I'm looking for the exact edition shown on my list. The buttons already open the right one, so stay on that page and don't switch to another version. Some reprints look almost identical to the original but carry a small symbol in the bottom-left corner (for example cards from The List and the Mystery Boosters). Here is Parallax Wave:</p>
@@ -559,6 +596,12 @@
     <h3><span class="num">6</span><span data-lang="en">Expensive cards (100 €+)</span><span data-lang="it">Carte costose (100 €+)</span></h3>
     <p data-lang="en">Before buying, you can message the seller and ask for <b>"scans front and back"</b>: photos of the actual card, so you can see its real condition. Serious sellers are used to this request.</p>
     <p data-lang="it">Prima di comprare, puoi scrivere al venditore e chiedere <b>"scans front and back"</b> (scansioni fronte e retro): foto della carta vera, per vederne le reali condizioni. I venditori seri sono abituati a questa richiesta.</p>
+
+    <div class="needs-booking">
+      <h3><span class="num">7</span><span data-lang="en">Book the card you'll gift</span><span data-lang="it">Prenota la carta che regali</span></h3>
+      <p data-lang="en">Press <b>I'LL GIFT THIS</b> under the card: everyone else will see it as booked, so two people don't buy the same one. I can't see the bookings. Changed your mind? Cancel it from the same browser you booked it with.</p>
+      <p data-lang="it">Premi <b>LA REGALO IO</b> sotto la carta: gli altri la vedranno come prenotata, così nessuno compra la stessa. Io non vedo le prenotazioni. Hai cambiato idea? Puoi annullare dallo stesso browser con cui hai prenotato.</p>
+    </div>
 
     <div class="dialog-buttons" id="guideContinueWrap" hidden>
       <a class="btn alt" id="guideContinue" target="_blank" rel="noopener"><span data-lang="en">CONTINUE TO </span><span data-lang="it">CONTINUA SU </span><span class="site-upper"></span> ↗</a>
@@ -797,6 +840,8 @@
 })();
 
 /* ---------------- Dream list ---------------- */
+// text in both languages; CSS shows the one matching <html data-ui>
+const tr = (en, it) => `<span data-lang="en">${en}</span><span data-lang="it">${it}</span>`;
 (async () => {
   const list = document.getElementById("list");
 
@@ -807,11 +852,11 @@
     const res = await fetch("cards.json?v=" + Date.now(), { cache: "no-store" });
     entries = await res.json();
   } catch (e) {
-    showMessage("couldn't read cards.json");
+    showMessage(tr("couldn't read cards.json", "impossibile leggere cards.json"));
     return;
   }
   if (!Array.isArray(entries) || entries.length === 0) {
-    showMessage("no dreams yet…<br>the sky is clear ☁");
+    showMessage(tr("no dreams yet…<br>the sky is clear ☁", "ancora nessun sogno…<br>il cielo è sereno ☁"));
     return;
   }
 
@@ -898,6 +943,7 @@
     const interest = Math.min(5, Math.max(1, Number(entry.interest) || 3));
     const el = document.createElement("article");
     el.className = "panel entry";
+    el.dataset.uid = entry.uid || "";
     el.style.animationDelay = `${Math.min(i, 12) * 60}ms`;
 
     const sparkles = isFoil
@@ -914,27 +960,29 @@
             : `<div class="missing">${escapeHtml(entry.name)}<br>(no image)</div>`}
           ${entry.finish === "foil" && hasShootingStar(card) ? SHOOTING_STAR : ""}
           ${sparkles}
-          ${images.length > 1 ? `<button class="btn small flip" type="button">FLIP</button>` : ""}
+          ${images.length > 1 ? `<button class="btn small flip" type="button">${tr("FLIP", "GIRA")}</button>` : ""}
+          <span class="ribbon"><span class="stamp">${tr("BOOKED", "PRENOTATA")}<small>${tr("BY YOU", "DA TE")}</small></span></span>
         </div>
       </div>
       <div>
         <a class="name" href="${escapeHtml((card && card.scryfall_uri) || "https://scryfall.com/search?q=" + encodeURIComponent('!"' + entry.name + '"'))}" target="_blank" rel="noopener">${escapeHtml(entry.name)}</a>
         <div class="set">${escapeHtml(setName)} · ${escapeHtml(setCode)} #${escapeHtml(cn)}</div>
-        <div class="interest" title="How much I want it: ${interest}/5">${[1, 2, 3, 4, 5].map((n) => heartSvg(n <= interest)).join("")}</div>
+        <div class="interest" title="${interest}/5">${[1, 2, 3, 4, 5].map((n) => heartSvg(n <= interest)).join("")}</div>
       </div>
       <div class="badges">
-        <span class="badge">${escapeHtml(lang.label)}</span>
-        <span class="badge" title="${escapeHtml(cond.label)}">${escapeHtml(cond.code === "ANY" ? "ANY COND." : cond.code + "+")}</span>
-        <span class="badge ${isFoil ? "foil-badge" : ""}">${escapeHtml(FINISHES[entry.finish] || "Non-foil")}</span>
+        <span class="badge">${tr(escapeHtml(lang.label), escapeHtml(lang.it || lang.label))}</span>
+        <span class="badge" title="${escapeHtml(cond.label)}">${cond.code === "ANY" ? tr("ANY COND.", "QUALSIASI") : escapeHtml(cond.code) + "+"}</span>
+        <span class="badge ${isFoil ? "foil-badge" : ""}">${tr(FINISHES[entry.finish] || "Non-foil", FINISHES_IT[entry.finish] || "Non foil")}</span>
         ${(Number(entry.quantity) || 1) > 1 ? `<span class="badge qty">×${Number(entry.quantity)}</span>` : ""}
-        <span class="badge no">NO signed/altered</span>
-        <span class="badge price" title="Cardmarket price via Scryfall">${price != null ? "~" + price.toFixed(2).replace(".", ",") + " €" : "price n/a"}</span>
+        <span class="badge no">${tr("NO signed/altered", "NO firmate/alterate")}</span>
+        <span class="badge price" title="Cardmarket price via Scryfall">${price != null ? "~" + price.toFixed(2).replace(".", ",") + " €" : tr("price n/a", "prezzo n/d")}</span>
       </div>
       ${entry.notes ? `<p class="notes">${escapeHtml(entry.notes)}</p>` : ""}
       <div class="links">
         <a class="btn" href="${escapeHtml(cardmarketUrl(entry, card))}" target="_blank" rel="noopener" data-site="Cardmarket"><span class="long">CARDMARKET</span><span class="short">CM</span></a>
         <a class="btn alt" href="${escapeHtml(cardtraderUrl(entry, card))}" target="_blank" rel="noopener" data-site="CardTrader"><span class="long">CARDTRADER</span><span class="short">CT</span></a>
-      </div>`;
+      </div>
+      <div class="booking"></div>`;
 
     // Double-faced cards: flip between faces
     const flip = el.querySelector(".flip");
@@ -1008,7 +1056,7 @@
   }
   // Sort keys: "list" (my order), "int-desc", "int-asc", "price-desc", "price-asc"
   const SORTS = [
-    { key: "list", label: "DEFAULT", title: "The order of my list" },
+    { key: "list", label: tr("DEFAULT", "LISTA"), title: "The order of my list / L'ordine della mia lista" },
     { key: "int-desc", label: `${heartSvg(true)} ↓`, title: "Interest, highest first" },
     { key: "int-asc", label: `${heartSvg(true)} ↑`, title: "Interest, lowest first" },
     { key: "price-desc", label: "€ ↓", title: "Cardmarket price, high to low" },
@@ -1107,6 +1155,96 @@
   addEventListener("resize", layout);
   document.getElementById("toolbar").hidden = false;
   buildSortButtons(); syncButtons(); layout(); order();
+
+  /* ---------- Bookings: a visitor can book the card they'll gift; others see it as booked ---------- */
+  // The owner's browsers never load bookings: the flag is set by Behind the Scenes (or ?owner=1),
+  // and a saved GitHub token also counts.
+  const isOwner = (() => {
+    try {
+      const q = new URLSearchParams(location.search).get("owner");
+      if (q === "1") localStorage.setItem("dreamlist.owner", "1");
+      if (localStorage.getItem("dreamlist.owner") === "1") return true;
+      return !!JSON.parse(localStorage.getItem("dreamlist.github") || "{}").token;
+    } catch { return false; }
+  })();
+  const MINE_KEY = "dreamlist.myBookings";             // { uid: cancel code } for bookings made in this browser
+  const loadMine = () => { try { return JSON.parse(localStorage.getItem(MINE_KEY) || "{}"); } catch { return {}; } };
+  const saveMine = (m) => { try { localStorage.setItem(MINE_KEY, JSON.stringify(m)); } catch {} };
+  let booked = new Set();
+  const ui = () => document.documentElement.dataset.ui || "en";
+  const T = {
+    gift: '<span data-lang="en">I\'LL GIFT THIS</span><span data-lang="it">LA REGALO IO</span>',
+    other: '<span data-lang="en">Already booked by someone else.</span><span data-lang="it">Già prenotata da qualcun altro.</span>',
+    mine: '<span data-lang="en">✓ You booked this.</span><span data-lang="it">✓ L\'hai prenotata tu.</span>',
+    cancel: '<span data-lang="en">Cancel</span><span data-lang="it">Annulla</span>',
+  };
+  function paintBooking(uid) {
+    const mine = loadMine();
+    for (const el of document.querySelectorAll(`.entry[data-uid="${CSS.escape(uid)}"]`)) {   // grid card + open pop-up
+      const isB = booked.has(uid), isM = isB && !!mine[uid];
+      el.classList.toggle("is-booked", isB);
+      el.classList.toggle("is-mine", isM);
+      el.querySelector(".booking").innerHTML = !isB
+        ? `<button type="button" class="btn gift" data-book="${uid}">${T.gift}</button>`
+        : isM
+          ? `<p class="note mine">${T.mine} <button type="button" class="cancel" data-unbook="${uid}">${T.cancel}</button></p>`
+          : `<p class="note">${T.other}</p>`;
+    }
+  }
+  const paintAll = () => items.forEach((it) => it.el.dataset.uid && paintBooking(it.el.dataset.uid));
+  async function bookingsPost(body) {
+    const res = await fetch(BOOKINGS_URL, { method: "POST", body: JSON.stringify(body) });   // text/plain: no preflight
+    return res.json();
+  }
+  if (BOOKINGS_URL && !isOwner) {
+    try {
+      const data = await fetch(`${BOOKINGS_URL}?t=${Date.now()}`).then((r) => r.json());
+      booked = new Set(data.booked || []);
+      const mine = loadMine();                          // forget bookings that no longer exist
+      for (const uid of Object.keys(mine)) if (!booked.has(uid)) delete mine[uid];
+      saveMine(mine);
+      document.documentElement.dataset.booking = "on";
+      paintAll();
+    } catch (e) {
+      console.warn("Bookings unavailable", e);
+    }
+  }
+  document.addEventListener("click", async (e) => {
+    const bookBtn = e.target.closest("[data-book]"), unbookBtn = e.target.closest("[data-unbook]");
+    if (!bookBtn && !unbookBtn) return;
+    e.stopPropagation();
+    const it = ui() === "it";
+    if (bookBtn) {
+      const uid = bookBtn.dataset.book;
+      const ok = confirm(it
+        ? "Prenotare questa carta? Gli altri visitatori la vedranno come prenotata (io no). Potrai annullare più tardi da questo stesso browser."
+        : "Book this card? Other visitors will see it as booked (I won't). You can cancel later from this same browser.");
+      if (!ok) return;
+      bookBtn.disabled = true;
+      try {
+        const r = await bookingsPost({ action: "book", uid });
+        if (r.ok) { const m = loadMine(); m[uid] = r.code; saveMine(m); }
+        else if (r.error === "already booked") alert(it ? "Qualcuno l'ha appena prenotata!" : "Someone has just booked it!");
+        else alert((it ? "Prenotazione non riuscita: " : "Booking failed: ") + r.error);
+        booked.add(uid);
+        if (!r.ok && r.error !== "already booked") booked.delete(uid);
+      } catch {
+        alert(it ? "Servizio di prenotazione non raggiungibile, riprova più tardi." : "Couldn't reach the booking service, please try again later.");
+      }
+      paintBooking(uid);
+    } else {
+      const uid = unbookBtn.dataset.unbook;
+      if (!confirm(it ? "Annullare la prenotazione?" : "Cancel your booking?")) return;
+      try {
+        const r = await bookingsPost({ action: "cancel", uid, code: loadMine()[uid] });
+        if (r.ok) { booked.delete(uid); const m = loadMine(); delete m[uid]; saveMine(m); }
+        else alert(it ? "Annullamento non riuscito." : "Couldn't cancel the booking.");
+      } catch {
+        alert(it ? "Servizio di prenotazione non raggiungibile, riprova più tardi." : "Couldn't reach the booking service, please try again later.");
+      }
+      paintBooking(uid);
+    }
+  }, true);
 })();
 </script>
 <script>
@@ -1124,10 +1262,11 @@ const Guide = (() => {
 
   function setLang(l) {
     document.documentElement.dataset.ui = l;
+    document.documentElement.lang = l;
     document.querySelectorAll("[data-setlang]").forEach((b) => b.classList.toggle("on", b.dataset.setlang === l));
     store.set(LANG_KEY, l);
   }
-  setLang(store.get(LANG_KEY) || ((navigator.language || "").toLowerCase().startsWith("it") ? "it" : "en"));
+  setLang(store.get(LANG_KEY) || "it");
   document.querySelectorAll("[data-setlang]").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.setlang)));
 
   function fillSite(root, p) {

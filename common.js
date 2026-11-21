@@ -2,20 +2,23 @@
 
 const SCRYFALL = "https://api.scryfall.com";
 
+// Bookings: the Google Apps Script web app URL (see bookings-apps-script.gs). Empty = bookings off.
+const BOOKINGS_URL = "";
+
 // Languages as Scryfall codes them, with Cardmarket's language ids for the link filters.
 const LANGUAGES = [
-  { code: "en",  label: "English",             cm: 1 },
-  { code: "it",  label: "Italian",             cm: 5 },
-  { code: "fr",  label: "French",              cm: 2 },
-  { code: "de",  label: "German",              cm: 3 },
-  { code: "es",  label: "Spanish",             cm: 4 },
-  { code: "pt",  label: "Portuguese",          cm: 8 },
-  { code: "ja",  label: "Japanese",            cm: 7 },
-  { code: "ko",  label: "Korean",              cm: 10 },
-  { code: "ru",  label: "Russian",             cm: 9 },
-  { code: "zhs", label: "Chinese (Simplified)",  cm: 6 },
-  { code: "zht", label: "Chinese (Traditional)", cm: 11 },
-  { code: "ph",  label: "Phyrexian",           cm: null },
+  { code: "en",  label: "English",               it: "Inglese",             cm: 1 },
+  { code: "it",  label: "Italian",               it: "Italiano",            cm: 5 },
+  { code: "fr",  label: "French",                it: "Francese",            cm: 2 },
+  { code: "de",  label: "German",                it: "Tedesco",             cm: 3 },
+  { code: "es",  label: "Spanish",               it: "Spagnolo",            cm: 4 },
+  { code: "pt",  label: "Portuguese",            it: "Portoghese",          cm: 8 },
+  { code: "ja",  label: "Japanese",              it: "Giapponese",          cm: 7 },
+  { code: "ko",  label: "Korean",                it: "Coreano",             cm: 10 },
+  { code: "ru",  label: "Russian",               it: "Russo",               cm: 9 },
+  { code: "zhs", label: "Chinese (Simplified)",  it: "Cinese semplificato", cm: 6 },
+  { code: "zht", label: "Chinese (Traditional)", it: "Cinese tradizionale", cm: 11 },
+  { code: "ph",  label: "Phyrexian",             it: "Phyrexiano",          cm: null },
 ];
 
 // Cardmarket condition scale (minCondition id used in links).
@@ -31,6 +34,7 @@ const CONDITIONS = [
 ];
 
 const FINISHES = { nonfoil: "Non-foil", foil: "Foil", etched: "Etched foil" };
+const FINISHES_IT = { nonfoil: "Non foil", foil: "Foil", etched: "Foil etched" };
 
 const langInfo = (code) => LANGUAGES.find((l) => l.code === code) || { code, label: code.toUpperCase(), cm: null };
 const condInfo = (code) => CONDITIONS.find((c) => c.code === code) || CONDITIONS[CONDITIONS.length - 1];

@@ -535,6 +535,8 @@ $("addInterest").addEventListener("click", (ev) => {
 });
 
 /* ---------- Init ---------- */
+// Mark this browser as the owner's: the Dream List then never loads or shows bookings here
+try { localStorage.setItem("dreamlist.owner", "1"); } catch {}
 $("condition").innerHTML = optionsHtml(CONDITIONS, "NM", "code", (c) => `${c.code === "ANY" ? "" : c.code + " · "}${c.label}`);
 setAddInterest(3);
 fillSettings();
