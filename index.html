@@ -11,9 +11,15 @@
   // interface language: Italian unless the visitor picked English
   try { const l = localStorage.getItem("dreamlist.lang"); if (l === "en" || l === "it") { document.documentElement.dataset.ui = l; document.documentElement.lang = l; } } catch (e) {}
 </script>
+<link rel="preconnect" href="https://cards.scryfall.io">
+<link rel="preconnect" href="https://api.scryfall.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<!-- fonts load without blocking the first paint -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet"></noscript>
 <style>
   :root {
     --sky: #b5dcf3;
@@ -157,6 +163,8 @@
   }
 
   .entry { display: flex; flex-direction: column; gap: 12px; animation: float-in .6s steps(6) both; }
+  #list .entry { content-visibility: auto; contain-intrinsic-size: auto 280px auto 620px; }
+  #list.images-only .entry { contain-intrinsic-size: auto 170px auto 240px; }
   main.dense .panel.entry { padding: 10px; }
   @keyframes float-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
@@ -182,39 +190,41 @@
   .card.foil::after, .card.foil::before {
     content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
   }
+  /* the foil layers are larger than the card and slide with transform: cheap to animate */
   .card.foil::after {
+    inset: -50%;
     background: linear-gradient(115deg,
-      transparent 18%,
-      rgba(255, 70, 160, .55) 28%,
-      rgba(255, 210, 90, .55) 36%,
-      rgba(90, 255, 190, .55) 44%,
-      rgba(80, 190, 255, .55) 52%,
-      rgba(190, 110, 255, .55) 60%,
+      transparent 26%,
+      rgba(255, 70, 160, .55) 34%,
+      rgba(255, 210, 90, .55) 41%,
+      rgba(90, 255, 190, .55) 48%,
+      rgba(80, 190, 255, .55) 55%,
+      rgba(190, 110, 255, .55) 62%,
       transparent 72%);
-    background-size: 260% 260%;
-    background-position: var(--hx, 0%) var(--hy, 50%);
     mix-blend-mode: color-dodge;
     opacity: .32;
     animation: holo 6s ease-in-out infinite alternate;
   }
   .card.foil.etched::after {
     background: linear-gradient(115deg,
-      transparent 20%, rgba(255, 230, 170, .6) 34%, rgba(255, 255, 255, .7) 44%,
-      rgba(200, 220, 255, .6) 54%, rgba(255, 200, 220, .6) 62%, transparent 74%);
-    background-size: 260% 260%;
+      transparent 28%, rgba(255, 230, 170, .6) 38%, rgba(255, 255, 255, .7) 46%,
+      rgba(200, 220, 255, .6) 54%, rgba(255, 200, 220, .6) 62%, transparent 72%);
     mix-blend-mode: overlay;
     opacity: .5;
   }
   .card.foil::before {
     z-index: 2;
-    background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, .38) 50%, transparent 58%);
-    background-size: 300% 100%;
+    inset: 0 -100%;
+    background: linear-gradient(105deg, transparent 45%, rgba(255, 255, 255, .38) 50%, transparent 55%);
     mix-blend-mode: soft-light;
     animation: sheen 3.8s linear infinite;
   }
-  @keyframes holo { from { background-position: 0% 30%; } to { background-position: 100% 70%; } }
-  @keyframes sheen { from { background-position: 150% 0; } to { background-position: -50% 0; } }
-  .card:hover.foil::after { animation: none; }
+  @keyframes holo { from { transform: translate3d(-16%, -8%, 0); } to { transform: translate3d(16%, 8%, 0); } }
+  @keyframes sheen { from { transform: translate3d(40%, 0, 0); } to { transform: translate3d(-40%, 0, 0); } }
+  .card:hover.foil::after {
+    animation: none;   /* the rainbow follows the pointer */
+    transform: translate3d(calc((var(--hx, 50%) - 50%) * -0.32), calc((var(--hy, 50%) - 50%) * -0.16), 0);
+  }
 
   /* Old-border foil stamp: the classic shooting star (1999–2003 foils), drawn on the card's 488×680 grid */
   .shooting-star { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; overflow: visible; }
@@ -858,6 +868,14 @@ const tr = (en, it) => `<span data-lang="en">${en}</span><span data-lang="it">${
     showMessage(tr("no dreams yet…<br>the sky is clear ☁", "ancora nessun sogno…<br>il cielo è sereno ☁"));
     return;
   }
+  // Pictures have fixed addresses, so the first rows can start downloading before the card data arrives
+  const EAGER = 12;
+  const preloads = entries.slice(0, EAGER).filter((e) => e.scryfall_id).map((e) => {
+    const im = new Image();
+    im.fetchPriority = "high";
+    im.src = scryImg(e.scryfall_id);
+    return im;
+  });
 
   // Shooting star foil stamp. Measured on a 1997-frame foil scan, in the card's 488×680 coordinates:
   // star centre at the text box's bottom-left corner, 8 rays, crescent tail arcing up-right.
@@ -930,7 +948,12 @@ const tr = (en, it) => `<span data-lang="en">${en}</span><span data-lang="it">${
 
   entries.forEach((entry, i) => {
     const card = cards.get(entry.scryfall_id);
-    const images = cardImages(card, "normal");
+    const official = cardImages(card, "normal");      // Scryfall's own URLs, used as a fallback
+    const id = entry.scryfall_id;
+    const images = !id ? official
+      : card && !card.image_uris && official.length > 1 ? [scryImg(id, "front"), scryImg(id, "back")]
+      : card && !official.length ? []
+      : [scryImg(id)];
     const isFoil = entry.finish === "foil" || entry.finish === "etched";
     const lang = langInfo(entry.lang || "en");
     const cond = condInfo(entry.condition || "ANY");
@@ -955,7 +978,7 @@ const tr = (en, it) => `<span data-lang="en">${en}</span><span data-lang="it">${
       <div class="card-wrap">
         <div class="card ${isFoil ? "foil" : ""} ${entry.finish === "etched" ? "etched" : ""}">
           ${images.length
-            ? `<img src="${escapeHtml(images[0])}" alt="${escapeHtml(entry.name)}" loading="lazy">`
+            ? `<img src="${escapeHtml(images[0])}" alt="${escapeHtml(entry.name)}" width="488" height="680" decoding="async" ${i < EAGER ? 'fetchpriority="high"' : 'loading="lazy"'} data-fallback="${escapeHtml(official[0] || "")}">`
             : `<div class="missing">${escapeHtml(entry.name)}<br>(no image)</div>`}
           ${entry.finish === "foil" && hasShootingStar(card) ? SHOOTING_STAR : ""}
           ${sparkles}
@@ -982,6 +1005,13 @@ const tr = (en, it) => `<span data-lang="en">${en}</span><span data-lang="it">${
         <a class="btn alt" href="${escapeHtml(cardtraderUrl(entry, card))}" target="_blank" rel="noopener" data-site="CardTrader"><span class="long">CARDTRADER</span><span class="short">CT</span></a>
       </div>
       <div class="booking"></div>`;
+
+    const imgEl = el.querySelector(".card img");
+    if (imgEl) imgEl.addEventListener("error", () => {
+      const fb = imgEl.dataset.fallback;
+      if (fb && imgEl.src !== fb) { imgEl.src = fb; return; }
+      imgEl.replaceWith(Object.assign(document.createElement("div"), { className: "missing", textContent: entry.name }));
+    });
 
     // Double-faced cards: flip between faces
     const flip = el.querySelector(".flip");

@@ -75,6 +75,10 @@ async function fetchCollection(ids) {
   return out;
 }
 
+// Direct image address on Scryfall's CDN, built from the card id alone (no API call needed)
+const scryImg = (id, face = "front", size = "normal") =>
+  `https://cards.scryfall.io/${size}/${face}/${id[0]}/${id[1]}/${id}.jpg`;
+
 // Image URLs for a card; double-faced cards return both faces.
 function cardImages(card, size = "normal") {
   if (!card) return [];
