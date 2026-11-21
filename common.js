@@ -3,7 +3,7 @@
 const SCRYFALL = "https://api.scryfall.com";
 
 // Bookings: the Google Apps Script web app URL (see bookings-apps-script.gs). Empty = bookings off.
-const BOOKINGS_URL = "";
+const BOOKINGS_URL = "https://script.google.com/macros/s/AKfycbwxZnS1e5ekevjhkFAttfoibmrCI-88GONB7EjACHDKU9O1fEe5miFe6m5Y0LV1052GJw/exec";
 
 // Languages as Scryfall codes them, with Cardmarket's language ids for the link filters.
 const LANGUAGES = [
